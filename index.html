@@ -314,7 +314,7 @@
       <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this)">
     </div>
     <div class="header-center"><h1>Gruppegenerator</h1></div>
-    <div class="header-right"><span class="version">v1.15</span></div>
+    <div class="header-right"><span class="version">v1.16</span></div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('main',this)">Generer</button>
@@ -740,55 +740,91 @@ function tryGenerate(people,numGroups,maxSize){
 }
 
 function distributeBalanced(groups,rem,maxSize){
-  // Build "total games played" per person to detect new players
-  const totalGames={};
-  for(const[k,v] of Object.entries(S.coOcc)){const[a,b]=k.split('|');totalGames[a]=(totalGames[a]||0)+v;totalGames[b]=(totalGames[b]||0)+v;}
-
-  const pool=[...rem];const hasHist=Object.keys(S.coOcc).length>0;
+  // Simple greedy fill respecting category balance — local search will optimize afterwards
+  const pool=[...rem];
   while(pool.length){
-    // Pick the group with fewest members (most space), break ties randomly
-    const minSize=Math.min(...groups.map(g=>g.length));
-    const smallestGroups=groups.map((g,i)=>({i,len:g.length})).filter(x=>x.len===minSize&&x.len<maxSize);
-    if(!smallestGroups.length)break;
-    const tgIdx=smallestGroups[Math.floor(Math.random()*smallestGroups.length)].i;
-    const tg=groups[tgIdx];
-
-    // Category balance: find least-represented category among pool
+    const avail=groups.map((g,i)=>({i,space:maxSize-g.length})).filter(g=>g.space>0).sort((a,b)=>b.space-a.space);
+    if(!avail.length)break;
+    const tg=groups[avail[0].i];
     const catCnts={};for(const p of tg)catCnts[p.cat]=(catCnts[p.cat]||0)+1;
     const poolCats=[...new Set(pool.map(p=>p.cat))];if(!poolCats.length)break;
     poolCats.sort((a,b)=>(catCnts[a]||0)-(catCnts[b]||0));
     const catPool=pool.filter(p=>p.cat===poolCats[0]);
-
-    let chosen;
-    if(hasHist&&tg.length>0){
-      // Score: sum of co-occurrences with current group
-      const scored=catPool.map(p=>({
-        p,
-        sumCo:tg.reduce((s,ex)=>s+gco(p.name,ex.name),0),
-        maxCo:tg.reduce((m,ex)=>Math.max(m,gco(p.name,ex.name)),0)
-      }));
-      // Sort: primary=sumCo, secondary=maxCo
-      scored.sort((a,b)=>a.sumCo-b.sumCo||a.maxCo-b.maxCo);
-      // Among those tied at minimum sum, pick randomly
-      const minSum=scored[0].sumCo;
-      const tied=scored.filter(x=>x.sumCo===minSum);
-      chosen=tied[Math.floor(Math.random()*tied.length)].p;
-    }else{
-      chosen=catPool[Math.floor(Math.random()*catPool.length)];
-    }
+    const chosen=catPool[Math.floor(Math.random()*catPool.length)];
     tg.push(chosen);pool.splice(pool.indexOf(chosen),1);
   }
 }
 
-function scoreGroups(groups){
-  // Category balance variance (primary weight)
-  const cats=[...new Set(groups.flat().map(p=>p.cat))];let catVar=0;
-  for(const cat of cats){const cnts=groups.map(g=>g.filter(p=>p.cat===cat).length);const mean=cnts.reduce((a,b)=>a+b,0)/cnts.length;catVar+=cnts.reduce((s,c)=>s+Math.pow(c-mean,2),0)/cnts.length;}
-  // Co-occurrence: minimize MAX co-occurrence (minimax = most fair distribution)
-  let maxCo=0,totalCo=0;
-  for(const g of groups)for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){const v=gco(g[i].name,g[j].name);if(v>maxCo)maxCo=v;totalCo+=v;}
-  // Primary: catVar, Secondary: maxCo (minimax), Tertiary: totalCo
-  return catVar*10000+maxCo*100+totalCo;
+// Compute variance of all pairwise co-occurrences IF this grouping is applied
+function coVarScore(groups){
+  const all=groups.flat();
+  const n=all.length;
+  if(n<2)return 0;
+  const vals=[];
+  for(let i=0;i<n;i++){
+    for(let j=i+1;j<n;j++){
+      const base=gco(all[i].name,all[j].name);
+      const together=groups.some(g=>g.includes(all[i])&&g.includes(all[j]));
+      vals.push(together?base+1:base);
+    }
+  }
+  const mean=vals.reduce((a,b)=>a+b,0)/vals.length;
+  return vals.reduce((s,v)=>s+(v-mean)*(v-mean),0)/vals.length;
+}
+
+// Category balance variance (keep groups even across categories)
+function catBalanceScore(groups){
+  const cats=[...new Set(groups.flat().map(p=>p.cat))];let v=0;
+  for(const cat of cats){
+    const cnts=groups.map(g=>g.filter(p=>p.cat===cat).length);
+    const mean=cnts.reduce((a,b)=>a+b,0)/cnts.length;
+    v+=cnts.reduce((s,c)=>s+(c-mean)*(c-mean),0)/cnts.length;
+  }
+  return v;
+}
+
+// Local search: repeatedly swap pairs of players between groups to minimize co-occurrence variance
+// Only swaps same-category players so category balance is never disturbed
+function localSearch(groups,iters){
+  iters=iters||4000;
+  // If no history yet, skip (all scores equal)
+  if(!Object.keys(S.coOcc).length)return groups;
+
+  let score=coVarScore(groups);
+
+  for(let it=0;it<iters;it++){
+    // Pick two different random groups
+    const g1i=Math.floor(Math.random()*groups.length);
+    let g2i;do{g2i=Math.floor(Math.random()*groups.length);}while(g2i===g1i);
+    const g1=groups[g1i],g2=groups[g2i];
+    if(!g1.length||!g2.length)continue;
+
+    // Pick random players, same category only
+    const p1i=Math.floor(Math.random()*g1.length);
+    const p1=g1[p1i];
+    const samecat=g2.filter(p=>p.cat===p1.cat);
+    if(!samecat.length)continue;
+    const p2=samecat[Math.floor(Math.random()*samecat.length)];
+    const p2i=g2.indexOf(p2);
+
+    // Swap
+    g1[p1i]=p2;g2[p2i]=p1;
+    const newScore=coVarScore(groups);
+    if(newScore<score){
+      score=newScore; // keep swap
+    }else{
+      g1[p1i]=p1;g2[p2i]=p2; // undo
+    }
+  }
+  return groups;
+}
+
+function buildGroups(people,numGroups,maxSize){
+  // 1. Place bindings first
+  const g=tryGenerate(people,numGroups,maxSize);
+  if(!g)return null;
+  // 2. Local search to minimize co-occurrence variance
+  return localSearch(g);
 }
 
 // ── Generate ──
@@ -797,11 +833,15 @@ function doGenerate(){
   const tot=people.length;if(tot<2){showToast('Minst 2 spillere må være med');return;}
   const{numGroups,maxSize}=calcGroups(tot);
   for(const b of S.bindings){const ab=b.filter(n=>!S.excluded.has(n));if(ab.length>maxSize){showToast(`En binding har ${ab.length} aktive spillere men maks er ${maxSize}`);return;}}
-  // Run 400 iterations, pick globally best (minimax scoring)
+  // Run 5 independent starts, keep the one with lowest co-occurrence variance
   let best=null,bestScore=Infinity;
-  for(let i=0;i<400;i++){const g=tryGenerate(people,numGroups,maxSize);if(!g)continue;const s=scoreGroups(g);if(s<bestScore){bestScore=s;best=g;if(s===0)break;}}
+  for(let i=0;i<5;i++){
+    const g=buildGroups(people,numGroups,maxSize);
+    if(!g)continue;
+    const s=coVarScore(g)+catBalanceScore(g)*10000;
+    if(s<bestScore){bestScore=s;best=g;}
+  }
   if(!best){showToast('Kunne ikke generere lag. Sjekk bindingene.');return;}
-  // Sort players within each group: cat A → B → C, then alphabetically
   best=best.map(g=>[...g].sort((a,b)=>catOrder(a.cat)-catOrder(b.cat)||a.name.localeCompare(b.name,'no')));
   S.currentGroups=best.map(g=>g.map(p=>({...p})));
   S.isSaved=false;
@@ -814,7 +854,12 @@ function reGenerate(){
   const tot=people.length;if(tot<2)return;
   const{numGroups,maxSize}=calcGroups(tot);
   let best=null,bestScore=Infinity;
-  for(let i=0;i<400;i++){const g=tryGenerate(people,numGroups,maxSize);if(!g)continue;const s=scoreGroups(g);if(s<bestScore){bestScore=s;best=g;if(s===0)break;}}
+  for(let i=0;i<5;i++){
+    const g=buildGroups(people,numGroups,maxSize);
+    if(!g)continue;
+    const s=coVarScore(g)+catBalanceScore(g)*10000;
+    if(s<bestScore){bestScore=s;best=g;}
+  }
   if(!best){showToast('Kunne ikke generere lag.');return;}
   best=best.map(g=>[...g].sort((a,b)=>catOrder(a.cat)-catOrder(b.cat)||a.name.localeCompare(b.name,'no')));
   S.currentGroups=best.map(g=>g.map(p=>({...p})));
