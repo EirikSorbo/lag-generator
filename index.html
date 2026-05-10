@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gruppegenerator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#edeae4;--surface:#f5f3ef;--card:#fff;--border:#ddd9d3;--border-strong:#c4bfb8;
+      --text:#1a1917;--muted:#7a756f;--hint:#aaa59e;
+      --primary:#1b4a38;--primary-hover:#143829;--primary-light:#e2ede7;
+      --danger:#b83030;--success:#1b6b3a;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+      --shadow-md:0 4px 8px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
+      --shadow-lg:0 14px 32px rgba(0,0,0,.13),0 4px 12px rgba(0,0,0,.08);
+      --radius:12px;--radius-sm:8px;--radius-xs:6px;
+      --cat-a:#2058c8;--cat-a-bg:#edf2fc;--cat-a-border:#b8cef4;
+      --cat-b:#a84f0d;--cat-b-bg:#fdf4ee;--cat-b-border:#f5c9a8;
+      --cat-c:#7040d0;--cat-c-bg:#f2eefb;--cat-c-border:#d4c4f5;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+
+    .header{background:var(--primary);color:#fff;padding:2rem 1.5rem;text-align:center}
+    .header h1{font-size:1.75rem;font-weight:600;letter-spacing:-.4px}
+
+    .main{max-width:940px;margin:0 auto;padding:2rem 1rem 4rem}
+    .section{margin-bottom:1.75rem}
+    .section-label{display:flex;align-items:center;gap:.75rem;margin-bottom:.875rem}
+    .step-num{width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;font-size:.75rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .section-title{font-size:.95rem;font-weight:600}
+    .card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow-sm);padding:1.25rem}
+    .divider{height:1px;background:var(--border);margin:1.5rem 0}
+    .hidden{display:none!important}
+
+    /* Settings */
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media(max-width:500px){.settings-grid{grid-template-columns:1fr}}
+    .setting-group{display:flex;flex-direction:column;gap:.5rem}
+    .setting-label{font-size:.8rem;font-weight:500;color:var(--muted)}
+    .mode-btns{display:flex;border:1px solid var(--border);border-radius:var(--radius-xs);overflow:hidden}
+    .mode-btn{flex:1;padding:.55rem .5rem;font-family:inherit;font-size:.8rem;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--muted);transition:all .15s}
+    .mode-btn.active{background:var(--primary);color:#fff}
+    .num-input{padding:.6rem .875rem;font-family:inherit;font-size:1rem;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);outline:none;width:100%;color:var(--text);background:var(--surface)}
+    .num-input:focus{border-color:var(--border-strong);background:#fff}
+    .hint-text{font-size:.78rem;color:var(--hint)}
+
+    /* Constraints */
+    .constraints-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.875rem}
+    .constraint-item{display:flex;align-items:center;justify-content:space-between;padding:.6rem .875rem;background:var(--surface);border-radius:var(--radius-xs);border:1px solid var(--border)}
+    .constraint-badges{display:flex;flex-wrap:wrap;gap:.375rem;flex:1}
+    .c-badge{padding:.2rem .55rem;border-radius:99px;font-size:.78rem;font-weight:500;border:1px solid transparent}
+    .c-badge[data-c=a]{background:var(--cat-a-bg);color:var(--cat-a);border-color:var(--cat-a-border)}
+    .c-badge[data-c=b]{background:var(--cat-b-bg);color:var(--cat-b);border-color:var(--cat-b-border)}
+    .c-badge[data-c=c]{background:var(--cat-c-bg);color:var(--cat-c);border-color:var(--cat-c-border)}
+    .c-del{background:none;border:none;cursor:pointer;color:var(--muted);opacity:.45;padding:0 0 0 .625rem;font-size:1.1rem;transition:opacity .15s;flex-shrink:0}
+    .c-del:hover{opacity:1;color:var(--danger)}
+    .empty-hint{font-size:.85rem;color:var(--hint);font-style:italic;margin-bottom:.875rem}
+    .btn-add-c{display:inline-flex;align-items:center;gap:.375rem;padding:.5rem 1rem;font-family:inherit;font-size:.85rem;font-weight:500;border:1.5px dashed var(--border-strong);border-radius:var(--radius-xs);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
+    .btn-add-c:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+
+    /* ── Player selection (step 3) ── */
+    .player-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem;flex-wrap:wrap;gap:.5rem}
+    .player-count-badge{font-size:.8rem;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:.2rem .75rem}
+    .btn-all-in{font-family:inherit;font-size:.78rem;font-weight:500;color:var(--primary);background:transparent;border:none;cursor:pointer;padding:.2rem .4rem;transition:opacity .15s}
+    .btn-all-in:hover{opacity:.7}
+    .player-cats{display:flex;flex-direction:column;gap:.875rem}
+    .player-cat-row{display:flex;align-items:flex-start;gap:.75rem}
+    .player-cat-tag{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;min-width:72px;padding-top:.35rem;flex-shrink:0}
+    .player-cat-tag[data-c=a]{color:var(--cat-a)}
+    .player-cat-tag[data-c=b]{color:var(--cat-b)}
+    .player-cat-tag[data-c=c]{color:var(--cat-c)}
+    .player-pills{display:flex;flex-wrap:wrap;gap:.4rem}
+    .player-pill{padding:.3rem .75rem;border-radius:99px;font-family:inherit;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .15s;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);line-height:1.4}
+    .player-pill:hover{border-color:var(--border-strong);color:var(--text)}
+    /* excluded / absent */
+    .player-pill.out{background:#fdf2f2;color:var(--danger);border-color:#f5c0c0;text-decoration:line-through}
+    .no-players-hint{font-size:.85rem;color:var(--hint);font-style:italic}
+
+    /* Tropp button row */
+    .tropp-row{margin-top:1.75rem;display:flex;justify-content:flex-end}
+    .btn-tropp{font-family:inherit;font-size:.82rem;font-weight:500;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:var(--radius-xs);padding:.4rem .875rem;cursor:pointer;transition:all .15s}
+    .btn-tropp:hover{color:var(--text);border-color:var(--border-strong);background:var(--surface)}
+
+    /* Generate */
+    .gen-row{text-align:center;margin:2rem 0 1rem}
+    .btn-gen{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2.75rem;font-family:inherit;font-size:1rem;font-weight:600;background:var(--primary);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;transition:all .2s;box-shadow:var(--shadow-md)}
+    .btn-gen:hover{background:var(--primary-hover);transform:translateY(-1px);box-shadow:var(--shadow-lg)}
+    .btn-gen:active{transform:translateY(0)}
+
+    /* Results */
+    .results-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.75rem}
+    .results-meta{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+    .results-title{font-size:1rem;font-weight:600}
+    .legend{display:flex;gap:.875rem;flex-wrap:wrap}
+    .legend-item{display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)}
+    .legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .legend-dot[data-c=a]{background:var(--cat-a)}
+    .legend-dot[data-c=b]{background:var(--cat-b)}
+    .legend-dot[data-c=c]{background:var(--cat-c)}
+    .results-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+    .btn-save{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;font-family:inherit;font-size:.875rem;font-weight:600;border:none;border-radius:var(--radius-xs);background:var(--primary);color:#fff;cursor:pointer;transition:all .15s;box-shadow:var(--shadow-sm)}
+    .btn-save:hover{background:var(--primary-hover)}
+    .btn-save.saved{background:var(--success)}
+    .btn-regen{display:inline-flex;align-items:center;gap:.375rem;padding:.5rem .875rem;font-family:inherit;font-size:.85rem;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);background:#fff;color:var(--text);cursor:pointer;transition:background .15s}
+    .btn-regen:hover{background:var(--surface)}
+    .unsaved-badge{font-size:.75rem;font-weight:500;color:#8a5a00;background:#fff8e6;border:1px solid #f0d080;border-radius:99px;padding:.2rem .65rem;display:inline-flex;align-items:center;gap:.35rem}
+    .unsaved-dot{width:6px;height:6px;border-radius:50%;background:#d4910a}
+    .edit-hint{font-size:.78rem;color:var(--hint);margin-bottom:.875rem}
+
+    /* Group cards */
+    .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem}
+    .group-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:border-color .15s,box-shadow .15s}
+    .group-card.drag-over{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+    .group-head{padding:.6rem 1rem;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:space-between}
+    .group-head-title{font-size:.78rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
+    .group-head-count{font-size:.72rem;opacity:.65}
+    .group-body{padding:.75rem 1rem;display:flex;flex-direction:column;gap:.3rem;min-height:48px}
+    .group-body.drag-over-body{background:var(--primary-light)}
+    .group-drop-hint{font-size:.75rem;color:var(--primary);opacity:.6;text-align:center;padding:.4rem 0;display:none}
+    .group-card.drag-over .group-drop-hint{display:block}
+    .member-row{display:flex;align-items:center;gap:.5rem;font-size:.875rem;padding:.25rem .3rem;border-radius:5px;cursor:grab;transition:background .1s,opacity .15s;user-select:none}
+    .member-row:hover{background:var(--surface)}
+    .member-row.is-dragging{opacity:.3;cursor:grabbing}
+    .drag-handle{color:var(--hint);font-size:.75rem;line-height:1;flex-shrink:0}
+    .m-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .m-dot[data-c=a]{background:var(--cat-a)}
+    .m-dot[data-c=b]{background:var(--cat-b)}
+    .m-dot[data-c=c]{background:var(--cat-c)}
+    .group-footer{padding:.45rem 1rem;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:.5rem;flex-wrap:wrap}
+    .cat-count-pill{padding:.15rem .5rem;border-radius:99px;font-size:.72rem;font-weight:500}
+    .cat-count-pill[data-c=a]{background:var(--cat-a-bg);color:var(--cat-a)}
+    .cat-count-pill[data-c=b]{background:var(--cat-b-bg);color:var(--cat-b)}
+    .cat-count-pill[data-c=c]{background:var(--cat-c-bg);color:var(--cat-c)}
+
+    /* Statistics */
+    .stats-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem}
+    .stats-title-area{display:flex;align-items:baseline;gap:.75rem;flex-wrap:wrap}
+    .stats-title{font-size:1rem;font-weight:600}
+    .stats-sub{font-size:.8rem;color:var(--hint)}
+    .btn-reset{padding:.35rem .75rem;font-family:inherit;font-size:.78rem;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
+    .btn-reset:hover{border-color:var(--danger);color:var(--danger);background:#fdf2f2}
+    .stats-empty{text-align:center;padding:2.5rem 1rem;color:var(--hint);font-size:.9rem}
+    .stats-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin-bottom:1.25rem}
+    .metric-card{background:var(--surface);border-radius:var(--radius-sm);padding:.875rem 1rem}
+    .metric-label{font-size:.72rem;font-weight:500;color:var(--muted);margin-bottom:.25rem}
+    .metric-value{font-size:1.5rem;font-weight:600;color:var(--primary);line-height:1}
+    .metric-sub{font-size:.72rem;color:var(--hint);margin-top:.2rem}
+    .heatmap-wrap{overflow-x:auto}
+    .heatmap{border-collapse:collapse}
+    .hm-corner{width:16px}
+    .hm-col-head{writing-mode:vertical-rl;transform:rotate(180deg);text-align:left;padding:4px 3px 0;font-size:.7rem;font-weight:500;height:72px;vertical-align:bottom;white-space:nowrap;cursor:default;font-family:'Sora',system-ui,sans-serif}
+    .hm-col-head[data-c=a]{color:var(--cat-a)}
+    .hm-col-head[data-c=b]{color:var(--cat-b)}
+    .hm-col-head[data-c=c]{color:var(--cat-c)}
+    .hm-row-head{text-align:right;padding:2px 8px 2px 0;font-size:.7rem;font-weight:500;white-space:nowrap;max-width:130px;overflow:hidden;text-overflow:ellipsis;cursor:default;font-family:'Sora',system-ui,sans-serif}
+    .hm-row-head[data-c=a]{color:var(--cat-a)}
+    .hm-row-head[data-c=b]{color:var(--cat-b)}
+    .hm-row-head[data-c=c]{color:var(--cat-c)}
+    .hm-cell{text-align:center;vertical-align:middle;font-size:.68rem;font-weight:600;cursor:default;border:2px solid var(--bg);transition:filter .12s;line-height:1}
+    .hm-cell:hover{filter:brightness(.85)}
+    .hm-self{background:#e8e4de!important;border:2px solid var(--bg)}
+    .hm-sep-col{border-left:3px solid var(--bg)!important}
+    .hm-sep-row>td,.hm-sep-row>th{border-top:3px solid var(--bg)!important}
+    .scale-bar{display:flex;align-items:center;gap:6px;margin-top:.875rem;flex-wrap:wrap}
+    .scale-label{font-size:.72rem;color:var(--muted)}
+    .scale-step{width:22px;height:22px;border-radius:3px;border:1px solid rgba(0,0,0,.07);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:600}
+    .pairs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.25rem}
+    @media(max-width:560px){.pairs-grid{grid-template-columns:1fr}}
+    .pairs-col{display:flex;flex-direction:column;gap:.4rem}
+    .pairs-col-title{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.2rem}
+    .pair-item{display:flex;align-items:center;gap:.375rem;flex-wrap:wrap;padding:.45rem .7rem;background:var(--surface);border-radius:var(--radius-xs);border:1px solid var(--border);font-size:.8rem}
+    .pair-count{margin-left:auto;font-size:.75rem;font-weight:600;color:var(--muted);white-space:nowrap}
+    .pair-count.hi{color:var(--danger)}
+    .pair-count.lo{color:var(--primary)}
+
+    /* Modals */
+    .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-start;justify-content:center;padding:1.5rem 1rem;overflow-y:auto}
+    .modal-backdrop.open{display:flex}
+    .modal{background:var(--card);border-radius:var(--radius);width:100%;box-shadow:var(--shadow-lg);margin:auto}
+    #poolModal .modal{max-width:720px}
+    .modal-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+    .modal-head h2{font-size:1rem;font-weight:600}
+    .modal-close{background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--muted);line-height:1;padding:.1rem;transition:color .15s;flex-shrink:0}
+    .modal-close:hover{color:var(--text)}
+    .pool-modal-body{padding:1.25rem 1.5rem}
+    .pool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+    .pool-cat-card{border-radius:var(--radius-sm);border:1.5px solid var(--border);overflow:hidden}
+    .pool-cat-head{padding:.65rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem}
+    .pool-cat-head[data-c=a]{background:var(--cat-a-bg);border-color:var(--cat-a-border)}
+    .pool-cat-head[data-c=b]{background:var(--cat-b-bg);border-color:var(--cat-b-border)}
+    .pool-cat-head[data-c=c]{background:var(--cat-c-bg);border-color:var(--cat-c-border)}
+    .pool-cat-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .pool-cat-dot[data-c=a]{background:var(--cat-a)}
+    .pool-cat-dot[data-c=b]{background:var(--cat-b)}
+    .pool-cat-dot[data-c=c]{background:var(--cat-c)}
+    .pool-cat-name-input{flex:1;font-family:inherit;font-size:.875rem;font-weight:600;background:transparent;border:none;outline:none}
+    .pool-cat-name-input[data-c=a]{color:var(--cat-a)}
+    .pool-cat-name-input[data-c=b]{color:var(--cat-b)}
+    .pool-cat-name-input[data-c=c]{color:var(--cat-c)}
+    .pool-cat-body{padding:.75rem 1rem;background:var(--card)}
+    .pool-input-row{display:flex;gap:.4rem;margin-bottom:.6rem}
+    .pool-name-input{flex:1;padding:.45rem .65rem;font-family:inherit;font-size:.82rem;border:1px solid var(--border);border-radius:var(--radius-xs);outline:none;background:var(--surface);color:var(--text)}
+    .pool-name-input:focus{border-color:var(--border-strong);background:#fff}
+    .pool-add-btn{padding:.45rem .75rem;font-family:inherit;font-size:.82rem;font-weight:500;border:1px solid var(--border-strong);border-radius:var(--radius-xs);background:#fff;color:var(--text);cursor:pointer;white-space:nowrap}
+    .pool-add-btn:hover{background:var(--surface)}
+    .pool-names-list{display:flex;flex-direction:column;gap:.3rem;max-height:200px;overflow-y:auto}
+    .pool-name-row{display:flex;align-items:center;justify-content:space-between;padding:.3rem .55rem;border-radius:4px;font-size:.82rem}
+    .pool-name-row[data-c=a]{background:var(--cat-a-bg);color:var(--cat-a)}
+    .pool-name-row[data-c=b]{background:var(--cat-b-bg);color:var(--cat-b)}
+    .pool-name-row[data-c=c]{background:var(--cat-c-bg);color:var(--cat-c)}
+    .pool-name-del{background:none;border:none;cursor:pointer;opacity:.4;color:inherit;font-size:.95rem;line-height:1;padding:0;transition:opacity .15s}
+    .pool-name-del:hover{opacity:1}
+    .pool-cat-count{font-size:.72rem;color:var(--hint);margin-top:.4rem}
+    .pool-modal-foot{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+    .pool-total{font-size:.8rem;color:var(--muted)}
+    .pool-total strong{color:var(--text);font-weight:600}
+    .btn-done{padding:.55rem 1.5rem;font-family:inherit;font-size:.875rem;font-weight:600;border:none;border-radius:var(--radius-xs);background:var(--primary);color:#fff;cursor:pointer}
+    .btn-done:hover{background:var(--primary-hover)}
+    #bindModal .modal{max-width:480px;max-height:85vh;display:flex;flex-direction:column}
+    .bind-modal-body{padding:1.25rem 1.5rem;overflow-y:auto;flex:1}
+    .modal-cat-section{margin-bottom:1.25rem}
+    .modal-cat-title{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;margin-bottom:.5rem}
+    .modal-cat-title[data-c=a]{color:var(--cat-a)}
+    .modal-cat-title[data-c=b]{color:var(--cat-b)}
+    .modal-cat-title[data-c=c]{color:var(--cat-c)}
+    .modal-names{display:flex;flex-wrap:wrap;gap:.45rem}
+    .m-name-btn{padding:.35rem .75rem;font-family:inherit;font-size:.82rem;font-weight:500;border-radius:99px;cursor:pointer;transition:all .15s;border:1.5px solid transparent}
+    .m-name-btn[data-c=a]{background:var(--cat-a-bg);color:var(--cat-a);border-color:var(--cat-a-border)}
+    .m-name-btn[data-c=b]{background:var(--cat-b-bg);color:var(--cat-b);border-color:var(--cat-b-border)}
+    .m-name-btn[data-c=c]{background:var(--cat-c-bg);color:var(--cat-c);border-color:var(--cat-c-border)}
+    .m-name-btn.sel[data-c=a]{background:var(--cat-a);color:#fff}
+    .m-name-btn.sel[data-c=b]{background:var(--cat-b);color:#fff}
+    .m-name-btn.sel[data-c=c]{background:var(--cat-c);color:#fff}
+    .modal-sel-label{font-size:.78rem;color:var(--hint);margin-bottom:1rem}
+    .modal-foot{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.75rem;justify-content:flex-end}
+    .btn-cancel{padding:.5rem 1rem;font-family:inherit;font-size:.875rem;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);background:transparent;color:var(--muted);cursor:pointer}
+    .btn-confirm{padding:.5rem 1.25rem;font-family:inherit;font-size:.875rem;font-weight:500;border:none;border-radius:var(--radius-xs);background:var(--primary);color:#fff;cursor:pointer}
+    .btn-confirm:disabled{opacity:.35;cursor:default}
+
+    .toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-130%);background:var(--danger);color:#fff;padding:.75rem 1.25rem;border-radius:var(--radius-sm);font-size:.875rem;font-weight:500;box-shadow:var(--shadow-lg);transition:transform .3s;z-index:400;max-width:90vw;text-align:center}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+    .toast.ok{background:var(--success)}
+  </style>
+</head>
+<body>
+
+<div class="header"><h1>Gruppegenerator</h1></div>
+
+<main class="main">
+
+  <!-- Step 1: Settings -->
+  <div class="section">
+    <div class="section-label"><div class="step-num">1</div><span class="section-title">Laginnstillinger</span></div>
+    <div class="card">
+      <div class="settings-grid">
+        <div class="setting-group">
+          <div class="setting-label">Modus</div>
+          <div class="mode-btns">
+            <button class="mode-btn active" id="modeCount" onclick="setMode('count')">Antall lag</button>
+            <button class="mode-btn" id="modeSize" onclick="setMode('size')">Spillere per lag</button>
+          </div>
+        </div>
+        <div class="setting-group">
+          <div class="setting-label" id="numLabel">Antall lag</div>
+          <input type="number" class="num-input" id="numInput" min="2" max="200" value="4" oninput="updateNum()">
+          <div class="hint-text" id="hintText">Legg til spillere for å se beregning</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Bindings -->
+  <div class="section">
+    <div class="section-label"><div class="step-num">2</div><span class="section-title">Spillere som alltid skal være på samme lag</span></div>
+    <div class="card">
+      <div class="constraints-list" id="constraintsList"></div>
+      <p class="empty-hint" id="emptyHint">Ingen bindinger lagt til ennå.</p>
+      <button class="btn-add-c" onclick="openBindModal()"><span style="font-size:1.1rem;line-height:1">+</span> Legg til binding</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Who's playing today -->
+  <div class="section">
+    <div class="section-label">
+      <div class="step-num">3</div>
+      <span class="section-title">Er noen borte i dag?</span>
+    </div>
+    <div class="card">
+      <div class="player-section-head">
+        <span class="player-count-badge" id="playerCountBadge">0 spillere</span>
+        <button class="btn-all-in" onclick="includeAll()">Nullstill</button>
+      </div>
+      <div class="player-cats" id="playerCats">
+        <div class="no-players-hint">Legg til spillere i troppen for å komme i gang.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Endre Tropp -->
+  <div class="tropp-row">
+    <button class="btn-tropp" onclick="openPoolModal()">Endre Tropp</button>
+  </div>
+
+  <!-- Generate -->
+  <div class="gen-row">
+    <button class="btn-gen" onclick="generate()">Generer lag</button>
+  </div>
+
+  <!-- Results -->
+  <div id="results" class="hidden">
+    <div class="divider"></div>
+    <div class="results-bar">
+      <div class="results-meta">
+        <div class="results-title" id="resultsTitle">Lag</div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="results-actions">
+        <span class="unsaved-badge hidden" id="unsavedBadge"><span class="unsaved-dot"></span>Ikke lagret</span>
+        <button class="btn-save" id="btnSave" onclick="saveToStats()">Lagre i statistikk</button>
+        <button class="btn-regen" onclick="generate()">↻ Generer på nytt</button>
+      </div>
+    </div>
+    <div class="edit-hint">Dra spillere mellom lag for å justere, og lagre etterpå.</div>
+    <div class="groups-grid" id="groupsGrid"></div>
+  </div>
+
+  <!-- Statistics -->
+  <div id="statsSection" class="hidden">
+    <div class="divider"></div>
+    <div class="stats-header">
+      <div class="stats-title-area">
+        <div class="stats-title">Statistikk over tid</div>
+        <div class="stats-sub" id="statsSub"></div>
+      </div>
+      <button class="btn-reset" onclick="resetStats()">Nullstill statistikk</button>
+    </div>
+    <div id="statsContent"></div>
+  </div>
+
+</main>
+
+<!-- Pool modal -->
+<div class="modal-backdrop" id="poolModal" onclick="handlePoolBackdrop(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Endre Tropp</h2>
+      <button class="modal-close" onclick="closePoolModal()">×</button>
+    </div>
+    <div class="pool-modal-body"><div class="pool-grid" id="poolGrid"></div></div>
+    <div class="pool-modal-foot">
+      <div class="pool-total" id="poolTotal"></div>
+      <button class="btn-done" onclick="closePoolModal()">Ferdig</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bind modal -->
+<div class="modal-backdrop" id="bindModal" onclick="handleBindBackdrop(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Legg til binding</h2>
+      <button class="modal-close" onclick="closeBindModal()">×</button>
+    </div>
+    <div class="bind-modal-body">
+      <p class="modal-sel-label" id="selLabel">0 valgt</p>
+      <div id="bindModalBody"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeBindModal()">Avbryt</button>
+      <button class="btn-confirm" id="confirmBtn" onclick="addConstraint()" disabled>Legg til</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const S = {
+  cats:[
+    {id:'a',name:'Kategori A',names:[]},
+    {id:'b',name:'Kategori B',names:[]},
+    {id:'c',name:'Kategori C',names:[]}
+  ],
+  mode:'count', num:4, bindings:[], sel:new Set(),
+  excluded:new Set(), // session-only, not persisted
+  coOcc:{}, genCount:0,
+  currentGroups:[], isSaved:false
+};
+
+let drag={person:null,fromGroup:-1,el:null};
+
+// ── Persist ──
+function saveCats(){try{localStorage.setItem('gf_cats',JSON.stringify(S.cats.map(c=>({id:c.id,name:c.name,names:c.names}))));}catch(e){}}
+function loadCats(){try{const d=localStorage.getItem('gf_cats');if(d){const s=JSON.parse(d);for(const x of s){const c=S.cats.find(c=>c.id===x.id);if(c){c.name=x.name;c.names=x.names;}}}}catch(e){}}
+function saveStats(){try{localStorage.setItem('gf_co',JSON.stringify(S.coOcc));localStorage.setItem('gf_gc',String(S.genCount));}catch(e){}}
+function loadStats(){try{S.coOcc=JSON.parse(localStorage.getItem('gf_co')||'{}');S.genCount=parseInt(localStorage.getItem('gf_gc')||'0');}catch(e){S.coOcc={};S.genCount=0;}}
+function resetStats(){if(!confirm('Nullstille all statistikk?'))return;S.coOcc={};S.genCount=0;saveStats();renderStats();}
+
+// ── Co-occ ──
+function ck(a,b){return[a,b].sort().join('|');}
+function gco(a,b){return S.coOcc[ck(a,b)]||0;}
+function recordGen(groups){
+  for(const g of groups)for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){const k=ck(g[i].name,g[j].name);S.coOcc[k]=(S.coOcc[k]||0)+1;}
+  S.genCount++;saveStats();
+}
+
+// ── Helpers ──
+function h(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function js(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+function catFor(name){return S.cats.find(c=>c.names.includes(name));}
+function allNames(){return S.cats.flatMap(c=>c.names);}
+function totalCount(){return allNames().length;}
+function activePlayers(){return S.cats.flatMap(c=>c.names.filter(n=>!S.excluded.has(n)));}
+function trunc(s,n){return s.length>n?s.slice(0,n-1)+'…':s;}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// ── Player selection (step 3) ──
+function renderPlayerSelection(){
+  const cont=document.getElementById('playerCats');
+  const badge=document.getElementById('playerCountBadge');
+  const tot=totalCount();
+  const excluded=S.excluded.size;
+  badge.textContent=excluded===0?'Alle er med':`${excluded} utelatt`;
+
+  if(!tot){
+    cont.innerHTML=`<div class="no-players-hint">Legg til spillere i troppen for å komme i gang.</div>`;
+    return;
+  }
+
+  cont.innerHTML=S.cats.filter(c=>c.names.length).map(cat=>`
+    <div class="player-cat-row">
+      <div class="player-cat-tag" data-c="${cat.id}">${h(cat.name)}</div>
+      <div class="player-pills">
+        ${cat.names.map(n=>{
+          const out=S.excluded.has(n);
+          return`<button class="player-pill${out?' out':''}" onclick="togglePlayer('${js(n)}')">${h(n)}</button>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+  updateHint();
+}
+
+function togglePlayer(name){
+  S.excluded.has(name)?S.excluded.delete(name):S.excluded.add(name);
+  renderPlayerSelection();
+}
+
+function includeAll(){
+  S.excluded.clear();
+  renderPlayerSelection();
+}
+
+// ── Settings ──
+function setMode(m){S.mode=m;document.getElementById('modeCount').classList.toggle('active',m==='count');document.getElementById('modeSize').classList.toggle('active',m==='size');document.getElementById('numLabel').textContent=m==='count'?'Antall lag':'Spillere per lag';updateHint();}
+function updateNum(){S.num=parseInt(document.getElementById('numInput').value)||2;updateHint();}
+function updateHint(){
+  const tot=activePlayers().length;const hint=document.getElementById('hintText');
+  if(!tot){hint.textContent='Legg til spillere for å se beregning';return;}
+  const n=Math.max(2,S.num);
+  hint.textContent=S.mode==='count'?`≈ ${Math.ceil(tot/Math.min(n,tot))} spillere per lag (${tot} aktive)`:`≈ ${Math.ceil(tot/n)} lag (${tot} aktive spillere)`;
+}
+
+// ── Constraints ──
+function renderConstraints(){
+  const list=document.getElementById('constraintsList');const empty=document.getElementById('emptyHint');
+  S.bindings=S.bindings.map(b=>b.filter(n=>allNames().includes(n))).filter(b=>b.length>=2);
+  if(!S.bindings.length){list.innerHTML='';empty.classList.remove('hidden');return;}
+  empty.classList.add('hidden');
+  list.innerHTML=S.bindings.map((b,i)=>`
+    <div class="constraint-item">
+      <div class="constraint-badges">${b.map(n=>{const cat=catFor(n);return`<span class="c-badge" data-c="${cat?.id||'a'}">${h(n)}</span>`;}).join('')}</div>
+      <button class="c-del" onclick="removeBinding(${i})">×</button>
+    </div>`).join('');
+}
+function removeBinding(i){S.bindings.splice(i,1);renderConstraints();}
+
+// ── Pool modal ──
+function openPoolModal(){renderPoolGrid();document.getElementById('poolModal').classList.add('open');}
+function closePoolModal(){
+  document.getElementById('poolModal').classList.remove('open');
+  // Clean excluded: remove names no longer in pool
+  for(const n of [...S.excluded])if(!allNames().includes(n))S.excluded.delete(n);
+  renderPlayerSelection();
+  renderConstraints();
+  if(!document.getElementById('statsSection').classList.contains('hidden'))renderStats();
+}
+function handlePoolBackdrop(e){if(e.target===document.getElementById('poolModal'))closePoolModal();}
+
+function renderPoolGrid(){
+  document.getElementById('poolGrid').innerHTML=S.cats.map(cat=>`
+    <div class="pool-cat-card">
+      <div class="pool-cat-head" data-c="${cat.id}">
+        <div class="pool-cat-dot" data-c="${cat.id}"></div>
+        <input class="pool-cat-name-input" data-c="${cat.id}" value="${h(cat.name)}" oninput="renameCat('${cat.id}',this.value)">
+      </div>
+      <div class="pool-cat-body">
+        <div class="pool-input-row">
+          <input type="text" class="pool-name-input" id="pni_${cat.id}" placeholder="Nytt navn…" onkeydown="if(event.key==='Enter')addPoolName('${cat.id}')">
+          <button class="pool-add-btn" onclick="addPoolName('${cat.id}')">+</button>
+        </div>
+        <div class="pool-names-list" id="pnl_${cat.id}">${renderPoolNameList(cat)}</div>
+        <div class="pool-cat-count" id="pnc_${cat.id}" ${!cat.names.length?'style="display:none"':''}>${cat.names.length} spillere</div>
+      </div>
+    </div>`).join('');
+  updatePoolTotal();
+}
+function renderPoolNameList(cat){return cat.names.map((n,i)=>`<div class="pool-name-row" data-c="${cat.id}"><span>${h(n)}</span><button class="pool-name-del" onclick="removePoolName('${cat.id}',${i})">×</button></div>`).join('');}
+function refreshPoolCat(catId){
+  const cat=S.cats.find(c=>c.id===catId);
+  const list=document.getElementById(`pnl_${catId}`);if(list)list.innerHTML=renderPoolNameList(cat);
+  const cnt=document.getElementById(`pnc_${catId}`);if(cnt){cnt.textContent=`${cat.names.length} spillere`;cnt.style.display=cat.names.length?'':'none';}
+  updatePoolTotal();
+}
+function updatePoolTotal(){document.getElementById('poolTotal').innerHTML=`<strong>${totalCount()}</strong> spillere totalt`;}
+function renameCat(id,val){S.cats.find(c=>c.id===id).name=val;saveCats();}
+function addPoolName(catId){
+  const inp=document.getElementById(`pni_${catId}`);const name=inp.value.trim();if(!name)return;
+  if(allNames().includes(name)){showToast(`"${name}" finnes allerede`);return;}
+  S.cats.find(c=>c.id===catId).names.push(name);inp.value='';saveCats();refreshPoolCat(catId);
+  document.getElementById(`pni_${catId}`)?.focus();
+}
+function removePoolName(catId,idx){
+  const cat=S.cats.find(c=>c.id===catId);const removed=cat.names[idx];cat.names.splice(idx,1);
+  S.bindings=S.bindings.map(b=>b.filter(n=>n!==removed)).filter(b=>b.length>=2);
+  S.excluded.delete(removed);
+  saveCats();refreshPoolCat(catId);
+}
+
+// ── Bind modal ──
+function openBindModal(){
+  if(totalCount()<2){showToast('Du trenger minst 2 spillere i troppen');return;}
+  S.sel=new Set();
+  document.getElementById('bindModalBody').innerHTML=S.cats.map(cat=>{
+    if(!cat.names.length)return'';
+    return`<div class="modal-cat-section"><div class="modal-cat-title" data-c="${cat.id}">${h(cat.name)}</div>
+      <div class="modal-names">${cat.names.map(n=>`<button class="m-name-btn" data-c="${cat.id}" onclick="toggleSel(this,'${js(n)}')">${h(n)}</button>`).join('')}</div></div>`;}).join('');
+  updateSelLabel();document.getElementById('bindModal').classList.add('open');
+}
+function closeBindModal(){document.getElementById('bindModal').classList.remove('open');}
+function handleBindBackdrop(e){if(e.target===document.getElementById('bindModal'))closeBindModal();}
+function toggleSel(btn,name){S.sel.has(name)?(S.sel.delete(name),btn.classList.remove('sel')):(S.sel.add(name),btn.classList.add('sel'));updateSelLabel();document.getElementById('confirmBtn').disabled=S.sel.size<2;}
+function updateSelLabel(){const n=S.sel.size;document.getElementById('selLabel').textContent=n===0?'Ingen valgt':n===1?'1 valgt':`${n} valgt`;}
+function addConstraint(){if(S.sel.size<2)return;S.bindings.push([...S.sel]);closeBindModal();renderConstraints();}
+
+// ── Algorithm ──
+function calcGroups(tot){
+  const n=Math.max(2,S.num);
+  return S.mode==='count'?{numGroups:Math.min(n,tot),maxSize:Math.ceil(tot/Math.min(n,tot))}:{numGroups:Math.ceil(tot/Math.max(2,n)),maxSize:Math.max(2,n)};
+}
+function tryGenerate(people,numGroups,maxSize){
+  const groups=Array.from({length:numGroups},()=>[]);const done=new Set();
+  // Only apply bindings where ALL members are active
+  const activeSet=new Set(people.map(p=>p.name));
+  const validBindings=S.bindings.filter(b=>b.every(n=>activeSet.has(n)));
+  for(const b of shuffle([...validBindings]).sort((a,b)=>b.length-a.length)){
+    const members=b.map(name=>people.find(p=>p.name===name)).filter(Boolean);
+    if(members.some(p=>done.has(p.name)))continue;
+    const cands=groups.map((g,i)=>({i,space:maxSize-g.length})).filter(g=>g.space>=members.length).sort((a,b)=>b.space-a.space);
+    if(!cands.length)return null;
+    const top=cands[0].space;const pool=cands.filter(g=>g.space>=top-1);
+    const chosen=pool[Math.floor(Math.random()*pool.length)];
+    for(const p of members){groups[chosen.i].push(p);done.add(p.name);}
+  }
+  distributeBalanced(groups,shuffle(people.filter(p=>!done.has(p.name))),maxSize);
+  return groups;
+}
+function distributeBalanced(groups,rem,maxSize){
+  const pool=[...rem];const hasHist=Object.keys(S.coOcc).length>0;
+  while(pool.length){
+    const avail=groups.map((g,i)=>({i,space:maxSize-g.length})).filter(g=>g.space>0).sort((a,b)=>b.space-a.space);
+    if(!avail.length)break;
+    const tg=groups[avail[0].i];
+    const catCnts={};for(const p of tg)catCnts[p.cat]=(catCnts[p.cat]||0)+1;
+    const poolCats=[...new Set(pool.map(p=>p.cat))];if(!poolCats.length)break;
+    poolCats.sort((a,b)=>(catCnts[a]||0)-(catCnts[b]||0));
+    const catPool=pool.filter(p=>p.cat===poolCats[0]);
+    let chosen;
+    if(hasHist&&tg.length>0){
+      const scored=catPool.map(p=>({p,s:tg.reduce((s,ex)=>s+gco(p.name,ex.name),0)})).sort((a,b)=>a.s-b.s);
+      const cut=Math.max(1,Math.ceil(scored.length*.5));
+      chosen=(Math.random()<.7?scored[0]:scored.slice(0,cut)[Math.floor(Math.random()*cut)]).p;
+    }else{chosen=catPool[Math.floor(Math.random()*catPool.length)];}
+    tg.push(chosen);pool.splice(pool.indexOf(chosen),1);
+  }
+}
+function scoreGroups(groups){
+  const cats=[...new Set(groups.flat().map(p=>p.cat))];let catVar=0;
+  for(const cat of cats){const cnts=groups.map(g=>g.filter(p=>p.cat===cat).length);const mean=cnts.reduce((a,b)=>a+b,0)/cnts.length;catVar+=cnts.reduce((s,c)=>s+Math.pow(c-mean,2),0)/cnts.length;}
+  let coTotal=0;for(const g of groups)for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++)coTotal+=gco(g[i].name,g[j].name);
+  return catVar*100+coTotal;
+}
+
+// ── Generate ──
+function generate(){
+  const people=S.cats.flatMap(cat=>cat.names.filter(n=>!S.excluded.has(n)).map(n=>({name:n,cat:cat.id,catName:cat.name})));
+  const tot=people.length;if(tot<2){showToast('Minst 2 spillere må være med');return;}
+  const{numGroups,maxSize}=calcGroups(tot);
+  for(const b of S.bindings){
+    const activeB=b.filter(n=>!S.excluded.has(n));
+    if(activeB.length>maxSize){showToast(`En binding har ${activeB.length} aktive spillere men maks er ${maxSize}`);return;}
+  }
+  let best=null,bestScore=Infinity;
+  for(let i=0;i<200;i++){const g=tryGenerate(people,numGroups,maxSize);if(!g)continue;const s=scoreGroups(g);if(s<bestScore){bestScore=s;best=g;if(s===0)break;}}
+  if(!best){showToast('Kunne ikke generere lag. Sjekk bindingene.');return;}
+  S.currentGroups=best.map(g=>g.map(p=>({...p})));
+  S.isSaved=false;
+  renderGroups();
+  document.getElementById('results').classList.remove('hidden');
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── Save ──
+function saveToStats(){
+  if(!S.currentGroups.length)return;
+  recordGen(S.currentGroups);S.isSaved=true;updateSaveBtn();renderStats();
+  showToast('Lagret i statistikk','ok');
+}
+function updateSaveBtn(){
+  const btn=document.getElementById('btnSave');const badge=document.getElementById('unsavedBadge');
+  if(S.isSaved){btn.textContent='✓ Lagret';btn.classList.add('saved');badge.classList.add('hidden');}
+  else{btn.textContent='Lagre i statistikk';btn.classList.remove('saved');badge.classList.remove('hidden');}
+}
+
+// ── Render groups ──
+function renderGroups(){
+  document.getElementById('resultsTitle').textContent=`${S.currentGroups.length} lag`;
+  document.getElementById('legend').innerHTML=S.cats.filter(c=>S.currentGroups.flat().some(p=>p.cat===c.id)).map(c=>`<div class="legend-item"><div class="legend-dot" data-c="${c.id}"></div><span>${h(c.name)}</span></div>`).join('');
+  updateSaveBtn();
+  document.getElementById('groupsGrid').innerHTML=S.currentGroups.map((g,gi)=>{
+    const cc={a:0,b:0,c:0};for(const p of g)cc[p.cat]=(cc[p.cat]||0)+1;
+    return`<div class="group-card" id="gc_${gi}" ondragover="onDragOver(event,${gi})" ondragleave="onDragLeave(event,${gi})" ondrop="onDrop(event,${gi})">
+      <div class="group-head"><div class="group-head-title">Lag ${gi+1}</div><div class="group-head-count">${g.length}</div></div>
+      <div class="group-body" id="gb_${gi}">
+        ${g.map((p,pi)=>`<div class="member-row" draggable="true" ondragstart="onDragStart(event,${gi},${pi})" ondragend="onDragEnd()">
+          <span class="drag-handle">⠿</span><div class="m-dot" data-c="${p.cat}"></div><span>${h(p.name)}</span>
+        </div>`).join('')}
+        <div class="group-drop-hint">Slipp her</div>
+      </div>
+      <div class="group-footer">${S.cats.filter(c=>cc[c.id]>0).map(c=>`<span class="cat-count-pill" data-c="${c.id}">${cc[c.id]} ${h(c.name)}</span>`).join('')}</div>
+    </div>`;}).join('');
+}
+
+// ── Drag and drop ──
+function onDragStart(e,gi,pi){drag={person:S.currentGroups[gi][pi],fromGroup:gi,el:e.currentTarget};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','');setTimeout(()=>drag.el?.classList.add('is-dragging'),0);}
+function onDragEnd(){drag.el?.classList.remove('is-dragging');drag={person:null,fromGroup:-1,el:null};document.querySelectorAll('.group-card.drag-over').forEach(el=>el.classList.remove('drag-over'));document.querySelectorAll('.group-body.drag-over-body').forEach(el=>el.classList.remove('drag-over-body'));}
+function onDragOver(e,gi){if(!drag.person||drag.fromGroup===gi)return;e.preventDefault();e.dataTransfer.dropEffect='move';document.getElementById(`gc_${gi}`)?.classList.add('drag-over');document.getElementById(`gb_${gi}`)?.classList.add('drag-over-body');}
+function onDragLeave(e,gi){if(e.currentTarget.contains(e.relatedTarget))return;document.getElementById(`gc_${gi}`)?.classList.remove('drag-over');document.getElementById(`gb_${gi}`)?.classList.remove('drag-over-body');}
+function onDrop(e,toGroup){
+  e.preventDefault();if(!drag.person||drag.fromGroup===toGroup)return;
+  const from=drag.fromGroup;const person=drag.person;
+  S.currentGroups[from]=S.currentGroups[from].filter(p=>p.name!==person.name);
+  S.currentGroups[toGroup].push(person);
+  S.isSaved=false;drag={person:null,fromGroup:-1,el:null};
+  renderGroups();
+}
+
+// ── Statistics ──
+function heatBg(v,m){if(!m||!v)return'#f0ede8';const t=Math.min(1,v/m);return`rgb(${Math.round(226+(27-226)*t)},${Math.round(237+(74-237)*t)},${Math.round(231+(56-231)*t)})`;}
+function heatFg(v,m){return(!m||!v)?'#c0bbb5':v/m>0.45?'#fff':'#1a1917';}
+function renderStats(){
+  const sec=document.getElementById('statsSection');const cont=document.getElementById('statsContent');
+  const names=S.cats.flatMap(c=>c.names.map(n=>({name:n,cat:c.id})));
+  document.getElementById('statsSub').textContent=`${S.genCount} økt${S.genCount!==1?'er':''} lagret`;
+  if(!S.genCount||names.length<2){cont.innerHTML=`<div class="stats-empty">Lagre lag for å bygge opp statistikk.</div>`;sec.classList.remove('hidden');return;}
+  let maxVal=0;
+  for(let i=0;i<names.length;i++)for(let j=i+1;j<names.length;j++){const v=gco(names[i].name,names[j].name);if(v>maxVal)maxVal=v;}
+  const n=names.length;const cs=n>24?20:n>16?26:n>10?32:38;
+  let tbl=`<div class="heatmap-wrap"><table class="heatmap"><thead><tr><th class="hm-corner"></th>`;
+  let prev=null;
+  for(const{name,cat}of names){const sep=prev&&cat!==prev?' hm-sep-col':'';tbl+=`<th class="hm-col-head${sep}" data-c="${cat}" title="${h(name)}" style="width:${cs}px">${h(trunc(name,10))}</th>`;prev=cat;}
+  tbl+=`</tr></thead><tbody>`;prev=null;
+  for(const{name:n1,cat:c1}of names){
+    const rs=prev&&c1!==prev?' hm-sep-row':'';tbl+=`<tr class="${rs}"><th class="hm-row-head" data-c="${c1}" title="${h(n1)}">${h(trunc(n1,16))}</th>`;
+    let p2=null;
+    for(const{name:n2,cat:c2}of names){
+      const cs2=p2&&c2!==p2?' hm-sep-col':'';
+      if(n1===n2){tbl+=`<td class="hm-self${cs2}" style="width:${cs}px;height:${cs}px"></td>`;}
+      else{const v=gco(n1,n2);tbl+=`<td class="hm-cell${cs2}" title="${h(n1)} ↔ ${h(n2)}: ${v} gang${v!==1?'er':''}" style="width:${cs}px;height:${cs}px;background:${heatBg(v,maxVal)};color:${heatFg(v,maxVal)}">${v>0?v:''}</td>`;}
+      p2=c2;
+    }
+    tbl+=`</tr>`;prev=c1;
+  }
+  tbl+=`</tbody></table></div>`;
+  let scale=`<div class="scale-bar"><span class="scale-label">Ganger på samme lag:</span>`;
+  for(let i=0;i<=6;i++){const v=Math.round(i*maxVal/6);scale+=`<div class="scale-step" style="background:${heatBg(v,maxVal)};color:${heatFg(v,maxVal)}">${v}</div>`;}
+  scale+=`</div>`;
+  const pairs=[];for(let i=0;i<names.length;i++)for(let j=i+1;j<names.length;j++){const v=gco(names[i].name,names[j].name);pairs.push({n1:names[i],n2:names[j],val:v});}
+  const most=[...pairs].sort((a,b)=>b.val-a.val).slice(0,7);const least=[...pairs].sort((a,b)=>a.val-b.val).slice(0,7);
+  function pRow(p,hi){const cls=hi&&p.val>0?'hi':(!hi&&p.val===0?'lo':'');return`<div class="pair-item"><span class="c-badge" data-c="${p.n1.cat}">${h(trunc(p.n1.name,13))}</span><span style="color:var(--hint);font-size:.72rem">og</span><span class="c-badge" data-c="${p.n2.cat}">${h(trunc(p.n2.name,13))}</span><span class="pair-count ${cls}">${p.val===1?'1 gang':`${p.val} ganger`}</span></div>`;}
+  const pairsHtml=`<div class="pairs-grid"><div class="pairs-col"><div class="pairs-col-title" style="color:var(--danger)">Mest på samme lag</div>${most.map(p=>pRow(p,true)).join('')}</div><div class="pairs-col"><div class="pairs-col-title" style="color:var(--primary)">Sjeldnest på samme lag</div>${least.map(p=>pRow(p,false)).join('')}</div></div>`;
+  const act=pairs.filter(p=>p.val>0).length;const avg=pairs.length?(pairs.reduce((s,p)=>s+p.val,0)/pairs.length).toFixed(1):0;
+  const metrics=`<div class="stats-metrics">
+    <div class="metric-card"><div class="metric-label">Økter lagret</div><div class="metric-value">${S.genCount}</div></div>
+    <div class="metric-card"><div class="metric-label">Par med kontakt</div><div class="metric-value">${act}</div><div class="metric-sub">av ${pairs.length} (${pairs.length?Math.round(act/pairs.length*100):0}%)</div></div>
+    <div class="metric-card"><div class="metric-label">Snitt per par</div><div class="metric-value">${avg}</div><div class="metric-sub">ganger</div></div>
+    <div class="metric-card"><div class="metric-label">Maks ett par</div><div class="metric-value">${maxVal}</div><div class="metric-sub">ganger</div></div>
+  </div>`;
+  cont.innerHTML=metrics+tbl+scale+`<div style="height:.875rem"></div>`+pairsHtml;
+  sec.classList.remove('hidden');
+}
+
+// ── Toast ──
+let tTimer;
+function showToast(msg,type='err'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type==='ok'?' ok':'')+' show';clearTimeout(tTimer);tTimer=setTimeout(()=>t.classList.remove('show'),3200);}
+
+// ── Init ──
+loadCats();loadStats();
+renderPlayerSelection();
+renderConstraints();
+updateHint();
+if(S.genCount>0)renderStats();
+</script>
+</body>
+</html>
