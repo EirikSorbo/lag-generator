@@ -154,13 +154,13 @@
     .cat-count-pill[data-c=c]{background:var(--cat-c-bg);color:var(--cat-c)}
 
     /* Date modal */
-    .date-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center;padding:1rem}
+    .date-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center;padding:1.25rem}
     .date-modal-backdrop.open{display:flex}
-    .date-modal-box{background:var(--card);border-radius:var(--radius);padding:1.5rem;width:calc(100% - 2rem);max-width:300px;box-shadow:var(--shadow-lg)}
-    .date-modal-box h2{font-size:1rem;font-weight:600;margin-bottom:1.25rem}
-    .date-field{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.25rem}
+    .date-modal-box{background:var(--card);border-radius:var(--radius);padding:1.25rem;width:100%;max-width:260px;box-shadow:var(--shadow-lg);overflow:hidden}
+    .date-modal-box h2{font-size:1rem;font-weight:600;margin-bottom:1rem}
+    .date-field{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.1rem}
     .date-field label{font-size:.8rem;font-weight:500;color:var(--muted)}
-    .date-input{padding:.6rem .75rem;font-family:inherit;font-size:.9rem;border:1px solid var(--border);border-radius:var(--radius-xs);outline:none;width:100%;color:var(--text);background:var(--surface);min-width:0}
+    .date-input{padding:.55rem .6rem;font-family:inherit;font-size:.85rem;border:1px solid var(--border);border-radius:var(--radius-xs);outline:none;width:100%;max-width:100%;color:var(--text);background:var(--surface);min-width:0;box-sizing:border-box}
     .date-input:focus{border-color:var(--border-strong);background:#fff}
     .date-modal-foot{display:flex;gap:.75rem;justify-content:flex-end}
     .btn-date-cancel{padding:.5rem 1rem;font-family:inherit;font-size:.875rem;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);background:transparent;color:var(--muted);cursor:pointer}
@@ -314,7 +314,7 @@
       <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this)">
     </div>
     <div class="header-center"><h1>Gruppegenerator</h1></div>
-    <div class="header-right"><span class="version">v1.14</span></div>
+    <div class="header-right"><span class="version">v1.15</span></div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('main',this)">Generer</button>
