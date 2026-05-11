@@ -210,6 +210,8 @@
     .archive-member{display:flex;align-items:center;gap:.4rem;font-size:.8rem}
     .archive-del{padding:.2rem .5rem;font-family:inherit;font-size:.72rem;color:var(--danger);background:transparent;border:1px solid #f5c0c0;border-radius:4px;cursor:pointer;margin-top:.5rem;display:block;width:100%;text-align:center;transition:background .15s}
     .archive-del:hover{background:#fdf2f2}
+    .archive-del-btn{padding:.25rem .6rem;font-family:inherit;font-size:.72rem;font-weight:500;color:var(--danger);background:transparent;border:1px solid #f5c0c0;border-radius:4px;cursor:pointer;transition:background .15s;white-space:nowrap;flex-shrink:0}
+    .archive-del-btn:hover{background:#fdf2f2}
 
     /* Pool modal */
     .modal-backdrop-pool{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-start;justify-content:center;padding:1.5rem 1rem;overflow-y:auto}
@@ -314,7 +316,7 @@
       <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this)">
     </div>
     <div class="header-center"><h1>Gruppegenerator</h1></div>
-    <div class="header-right"><span class="version">v1.18</span></div>
+    <div class="header-right"><span class="version">v1.19</span></div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('main',this)">Generer</button>
@@ -395,6 +397,7 @@
   <div class="main">
     <div class="stats-header">
       <div class="stats-title">Arkiv</div>
+      <button class="btn-reset" onclick="deleteAllArchive()">Slett hele arkivet</button>
     </div>
     <div id="archiveContent"></div>
   </div>
@@ -1005,6 +1008,7 @@ function renderArchive(){
         </div>
         <div class="archive-head-right">
           <div class="archive-summary">${entry.groups.length} lag · ${totalPlayers} spillere</div>
+          <button class="archive-del-btn" onclick="event.stopPropagation();deleteArchiveEntry(${ei})">Slett</button>
           <div class="archive-chevron" id="chev_${ei}">▾</div>
         </div>
       </div>
@@ -1015,7 +1019,6 @@ function renderArchive(){
             <div class="archive-group-body">${g.map(p=>`<div class="archive-member"><div class="m-dot" data-c="${p.cat}"></div><span>${h(p.name)}</span></div>`).join('')}</div>
           </div>`).join('')}
         </div>
-        <button class="archive-del" onclick="deleteArchiveEntry(${ei})">Slett denne oppføringen</button>
       </div>
     </div>`;}).join('')}</div>`;
 }
@@ -1026,6 +1029,11 @@ function toggleArchiveItem(ei){
 function deleteArchiveEntry(ei){
   if(!confirm('Slette denne oppføringen fra arkivet?'))return;
   S.archive.splice(ei,1);saveArchive();renderArchive();
+}
+function deleteAllArchive(){
+  if(!S.archive.length)return;
+  if(!confirm('Slette hele arkivet? Dette kan ikke angres.'))return;
+  S.archive=[];saveArchive();renderArchive();
 }
 
 // ── Toast ──
