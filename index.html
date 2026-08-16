@@ -8,8 +8,14 @@
   <meta name="apple-mobile-web-app-title" content="Gruppe-gen.">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#1b4a38">
-  <link rel="apple-touch-icon" id="touch-icon">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <!-- Skrifta skal ikke blokkere oppstart: uten dekning på banen må appen
+       vises med én gang, med systemskrift til Sora eventuelt kommer -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap"></noscript>
   <style>
     :root {
       --bg:#edeae4;--surface:#f5f3ef;--card:#fff;--border:#ddd9d3;--border-strong:#c4bfb8;
@@ -179,6 +185,7 @@
     .btn-reset{padding:.35rem .75rem;font-family:inherit;font-size:.78rem;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
     .btn-reset:hover{border-color:var(--danger);color:var(--danger);background:#fdf2f2}
     .stats-empty{text-align:center;padding:3rem 1rem;color:var(--hint);font-size:.9rem}
+    .stats-note{font-size:.78rem;color:var(--hint);margin-bottom:.875rem}
     .pairs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
     @media(max-width:520px){.pairs-grid{grid-template-columns:1fr}}
     .pairs-col{display:flex;flex-direction:column;gap:.4rem}
@@ -287,20 +294,53 @@
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
     .toast.ok{background:var(--success)}
 
+    /* Delevisning: skjuler alt som røper kategori */
+    .share-mode .m-dot,
+    .share-mode .group-footer,
+    .share-mode .drag-handle,
+    .share-mode .edit-hint{display:none!important}
+
+    /* Knapper */
+    .btn-light{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .875rem;font-family:inherit;font-size:.82rem;font-weight:500;border:1px solid rgba(255,255,255,.3);border-radius:var(--radius-xs);background:rgba(255,255,255,.12);color:#fff;cursor:pointer;transition:all .15s}
+    .btn-light:hover{background:rgba(255,255,255,.22)}
+    .btn-light.on{background:#fff;color:var(--primary);border-color:#fff}
+    .btn-light svg{display:block;flex-shrink:0}
+    .btn-soft{display:inline-flex;align-items:center;gap:.35rem;padding:.35rem .75rem;font-family:inherit;font-size:.78rem;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
+    .btn-soft:hover{border-color:var(--border-strong);color:var(--text);background:var(--surface)}
+    .btn-soft.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .btn-soft svg{display:block;flex-shrink:0}
+    .head-actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+    /* På smal skjerm står ikonene alene, ellers spiser knappene hele toppen */
+    @media(max-width:560px){
+      .modal-head{padding:.75rem .875rem;gap:.5rem}
+      .modal-head-left{gap:.5rem}
+      .modal-head-actions{gap:.35rem}
+      .btn-light .lbl,.btn-modal-regen .lbl,.btn-modal-save .lbl{display:none}
+      .btn-light,.btn-modal-regen{padding:.45rem .6rem}
+      .btn-modal-save{padding:.45rem .75rem}
+    }
+
+    /* Flytt-til-lag-meny (fungerer med berøring) */
+    .move-menu{display:none;position:fixed;z-index:600;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);padding:.3rem;min-width:160px;max-height:60vh;overflow-y:auto}
+    .move-menu.open{display:block}
+    .move-menu-title{font-size:.72rem;color:var(--muted);font-weight:500;padding:.35rem .55rem .45rem;border-bottom:1px solid var(--border);margin-bottom:.25rem}
+    .move-menu button{display:flex;align-items:center;justify-content:space-between;gap:.75rem;width:100%;text-align:left;padding:.55rem .55rem;font-family:inherit;font-size:.85rem;font-weight:500;border:none;background:none;color:var(--text);cursor:pointer;border-radius:var(--radius-xs)}
+    .move-menu button:hover{background:var(--primary-light);color:var(--primary)}
+    .move-menu button span{font-size:.75rem;color:var(--hint);font-weight:400}
+
+    /* Kategoribytte i troppen */
+    .pool-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+    .pool-row-right{display:flex;align-items:center;gap:.45rem;flex-shrink:0}
+    .pool-row-btn{background:none;border:none;cursor:pointer;color:inherit;opacity:.45;padding:0;line-height:1;transition:opacity .15s}
+    .pool-row-btn:hover{opacity:1}
+    .pool-row-btn svg{display:block}
+
   </style>
   <script>
-  (function(){
-    var c=document.createElement('canvas');c.width=c.height=512;
-    var ctx=c.getContext('2d');
-    // Green background matching Lagleder
-    ctx.fillStyle='#3d8b4a';ctx.fillRect(0,0,512,512);
-    // Draw emoji using browser's native font
-    ctx.font='260px serif';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('⚽',256,272);
-    var link=document.getElementById('touch-icon');
-    if(link) link.href=c.toDataURL('image/png');
-  })();
+  // Offline-støtte. Kjører ikke når fila åpnes direkte fra disk.
+  if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
+    addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+  }
   </script>
 </head>
 <body>
@@ -316,7 +356,7 @@
       <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this)">
     </div>
     <div class="header-center"><h1>Gruppegenerator</h1></div>
-    <div class="header-right"><span class="version">v1.19</span></div>
+    <div class="header-right"><span class="version">v1.21</span></div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('main',this)">Generer</button>
@@ -386,7 +426,13 @@
         <div class="stats-title">Statistikk over tid</div>
         <div class="stats-sub" id="statsSub"></div>
       </div>
-      <button class="btn-reset" onclick="resetStats()">Nullstill statistikk</button>
+      <div class="head-actions">
+        <button class="btn-soft" onclick="rebuildStatsClick()" title="Regn alle tall ut på nytt fra arkivet">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Bygg på nytt fra arkivet
+        </button>
+        <button class="btn-reset" onclick="resetStats()">Nullstill statistikk</button>
+      </div>
     </div>
     <div id="statsContent"></div>
   </div>
@@ -397,7 +443,13 @@
   <div class="main">
     <div class="stats-header">
       <div class="stats-title">Arkiv</div>
-      <button class="btn-reset" onclick="deleteAllArchive()">Slett hele arkivet</button>
+      <div class="head-actions">
+        <button class="btn-soft" id="btnShareArchive" onclick="toggleShareMode()" title="Skjul kategorier, for deling og skjermbilde">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M1.5 8S3.9 4 8 4s6.5 4 6.5 4-2.4 4-6.5 4S1.5 8 1.5 8Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="1.7" stroke="currentColor" stroke-width="1.3"/></svg>
+          Delevisning
+        </button>
+        <button class="btn-reset" onclick="deleteAllArchive()">Slett hele arkivet</button>
+      </div>
     </div>
     <div id="archiveContent"></div>
   </div>
@@ -428,13 +480,21 @@
         <div class="unsaved-badge hidden" id="unsavedBadge"><span class="unsaved-dot"></span>Ikke lagret</div>
       </div>
       <div class="modal-head-actions">
-        <button class="btn-modal-regen" onclick="reGenerate()">↻ Generer nytt lag</button>
+        <button class="btn-light" id="btnShare" onclick="toggleShareMode()" title="Skjul kategorier, for deling og skjermbilde">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M1.5 8S3.9 4 8 4s6.5 4 6.5 4-2.4 4-6.5 4S1.5 8 1.5 8Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="1.7" stroke="currentColor" stroke-width="1.3"/></svg>
+          <span class="lbl">Delevisning</span>
+        </button>
+        <button class="btn-light" onclick="copyTeams()" title="Kopier lagene som tekst">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="5.6" y="5.6" width="8" height="8.8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.6 5.6V3.4A1.4 1.4 0 0 0 9.2 2H4a1.4 1.4 0 0 0-1.4 1.4v7A1.4 1.4 0 0 0 4 11.8h1.6" stroke="currentColor" stroke-width="1.3"/></svg>
+          <span class="lbl">Kopier</span>
+        </button>
+        <button class="btn-modal-regen" onclick="reGenerate()" title="Generer nytt lag">↻<span class="lbl"> Generer nytt lag</span></button>
         <button class="btn-modal-save" id="btnSave" onclick="saveToStats()">Lagre i statistikk</button>
         <button class="btn-modal-close" onclick="closeResultsModal()">×</button>
       </div>
     </div>
     <div class="modal-body">
-      <div class="edit-hint">Dra spillere mellom lag for å justere, og lagre etterpå.</div>
+      <div class="edit-hint">Trykk på en spiller for å flytte hen til et annet lag, eller dra og slipp. Husk å lagre etterpå.</div>
       <div class="groups-grid" id="groupsGrid"></div>
     </div>
   </div>
@@ -473,6 +533,7 @@
   </div>
 </div>
 
+<div class="move-menu" id="moveMenu"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -485,13 +546,15 @@ const S = {
   ],
   mode:'count', num:4, bindings:[], sel:new Set(),
   excluded:new Set(),
-  coOcc:{}, genCount:0,
+  coOcc:{}, opp:{}, genCount:0,
   archive:[],
   currentGroups:[], isSaved:false,
-  currentMatchDate:''
+  currentMatchDate:'',
+  shareMode:false, shareSeed:1
 };
 
 let drag={person:null,fromGroup:-1,el:null};
+let lastDragEnd=0;
 
 // ── Tabs ──
 function switchTab(name,btn){
@@ -504,46 +567,124 @@ function switchTab(name,btn){
 }
 
 // ── Persist ──
-function saveCats(){try{localStorage.setItem('gf_cats',JSON.stringify(S.cats.map(c=>({id:c.id,name:c.name,names:c.names}))));}catch(e){}}
-function loadCats(){try{const d=localStorage.getItem('gf_cats');if(d){const s=JSON.parse(d);for(const x of s){const c=S.cats.find(c=>c.id===x.id);if(c){c.name=x.name;c.names=x.names;}}}}catch(e){}}
-function saveStats(){try{localStorage.setItem('gf_co',JSON.stringify(S.coOcc));localStorage.setItem('gf_gc',String(S.genCount));}catch(e){}}
-function loadStats(){try{S.coOcc=JSON.parse(localStorage.getItem('gf_co')||'{}');S.genCount=parseInt(localStorage.getItem('gf_gc')||'0');}catch(e){S.coOcc={};S.genCount=0;}}
-function saveArchive(){try{localStorage.setItem('gf_archive',JSON.stringify(S.archive));}catch(e){}}
-function loadArchive(){try{S.archive=JSON.parse(localStorage.getItem('gf_archive')||'[]');}catch(e){S.archive=[];}}
-function resetStats(){if(!confirm('Nullstille all statistikk?'))return;S.coOcc={};S.genCount=0;saveStats();renderStats();}
+// Lagring kan feile (full kvote, privat modus). Da skal brukeren få vite det,
+// i stedet for at data forsvinner i stillhet.
+let storageWarned=false;
+function warnStorage(){
+  if(storageWarned)return;storageWarned=true;
+  showToast('Kunne ikke lagre lokalt. Ta en eksport for sikkerhets skyld.');
+}
+function todayISO(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+function saveCats(){try{localStorage.setItem('gf_cats',JSON.stringify(S.cats.map(c=>({id:c.id,name:c.name,names:c.names}))));}catch(e){warnStorage();}}
+function loadCats(){try{const d=localStorage.getItem('gf_cats');if(d){const s=JSON.parse(d);if(Array.isArray(s))for(const x of s){const c=x&&S.cats.find(c=>c.id===x.id);if(c){if(typeof x.name==='string')c.name=x.name;if(Array.isArray(x.names))c.names=x.names.filter(n=>typeof n==='string');}}}}catch(e){}}
+function saveStats(){try{localStorage.setItem('gf_co',JSON.stringify(S.coOcc));localStorage.setItem('gf_opp',JSON.stringify(S.opp));localStorage.setItem('gf_gc',String(S.genCount));}catch(e){warnStorage();}}
+function loadStats(){
+  try{
+    S.coOcc=JSON.parse(localStorage.getItem('gf_co')||'{}')||{};
+    S.genCount=parseInt(localStorage.getItem('gf_gc')||'0')||0;
+    const o=localStorage.getItem('gf_opp');
+    S.opp=o?(JSON.parse(o)||{}):{};
+    // Eldre data mangler oppmøtetallene. De kan utledes av arkivet.
+    if(!o&&S.archive.length)S.needsOppRebuild=true;
+  }catch(e){S.coOcc={};S.opp={};S.genCount=0;}
+}
+function saveArchive(){try{localStorage.setItem('gf_archive',JSON.stringify(S.archive));}catch(e){warnStorage();}}
+function loadArchive(){try{const d=JSON.parse(localStorage.getItem('gf_archive')||'[]');S.archive=Array.isArray(d)?d:[];}catch(e){S.archive=[];}}
+// Bindinger er semi-permanente og skal overleve en omlasting
+function saveBindings(){try{localStorage.setItem('gf_bindings',JSON.stringify(S.bindings));}catch(e){warnStorage();}}
+function loadBindings(){try{const d=JSON.parse(localStorage.getItem('gf_bindings')||'[]');S.bindings=Array.isArray(d)?d.filter(b=>Array.isArray(b)&&b.length>=2).map(b=>b.filter(n=>typeof n==='string')):[];}catch(e){S.bindings=[];}}
+// Utelatelser gjelder dagens økt: de overlever en omlasting, men ikke natta
+function saveExcluded(){try{localStorage.setItem('gf_excl',JSON.stringify({date:todayISO(),names:[...S.excluded]}));}catch(e){warnStorage();}}
+function loadExcluded(){try{const d=JSON.parse(localStorage.getItem('gf_excl')||'null');if(d&&d.date===todayISO()&&Array.isArray(d.names))S.excluded=new Set(d.names.filter(n=>typeof n==='string'));}catch(e){}}
+function saveShare(){try{localStorage.setItem('gf_share',S.shareMode?'1':'0');}catch(e){}}
+function loadShare(){try{S.shareMode=localStorage.getItem('gf_share')==='1';}catch(e){}}
+function resetStats(){
+  if(!confirm('Nullstille statistikken? Arkivet beholdes, så du kan bygge tallene opp igjen fra arkivet etterpå.'))return;
+  S.coOcc={};S.opp={};S.genCount=0;saveStats();renderStats();
+}
+
+// Arkivet er fasit: statistikken kan alltid regnes ut på nytt fra det.
+// Vi teller to ting per par: hvor mange ganger de var på samme lag (coOcc),
+// og hvor mange økter begge i det hele tatt var med i (opp).
+function rebuildStatsFromArchive(){
+  S.coOcc={};S.opp={};
+  for(const e of S.archive){
+    if(!e||!Array.isArray(e.groups))continue;
+    const tilstede=e.groups.filter(Array.isArray).flat();
+    for(let i=0;i<tilstede.length;i++)for(let j=i+1;j<tilstede.length;j++){
+      const k=ck(tilstede[i].name,tilstede[j].name);S.opp[k]=(S.opp[k]||0)+1;
+    }
+    for(const g of e.groups){
+      if(!Array.isArray(g))continue;
+      for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){
+        const k=ck(g[i].name,g[j].name);S.coOcc[k]=(S.coOcc[k]||0)+1;
+      }
+    }
+  }
+  S.genCount=S.archive.length;
+  saveStats();
+}
+function rebuildStatsClick(){
+  if(!confirm(`Bygge statistikken på nytt? Alle tall regnes ut fra de ${S.archive.length} oppføringene i arkivet.`))return;
+  rebuildStatsFromArchive();renderStats();showToast('Statistikken er bygget på nytt fra arkivet','ok');
+}
 
 // ── Export / Import ──
 function exportData(){
   const payload={
-    version:2,
+    version:4,
     exported:new Date().toISOString(),
     cats:S.cats.map(c=>({id:c.id,name:c.name,names:c.names})),
+    bindings:S.bindings,
     coOcc:S.coOcc,
+    opp:S.opp,
     genCount:S.genCount,
     archive:S.archive
   };
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='gruppegenerator_'+new Date().toISOString().slice(0,10)+'.json';
+  a.href=url;
+  a.download='gruppegenerator_'+todayISO()+'.json';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(a.href);
+  document.body.removeChild(a);
+  // Ikke frigi URL-en med én gang: det avbryter nedlastingen i enkelte nettlesere
+  setTimeout(()=>URL.revokeObjectURL(url),10000);
   showToast('Data eksportert','ok');
 }
 function importData(input){
   const file=input.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=e=>{
-    try{
-      const d=JSON.parse(e.target.result);
-      if(!d.cats||!d.coOcc){showToast('Ugyldig fil');return;}
-      if(!confirm('Erstatte all eksisterende data med importert data?'))return;
-      for(const x of d.cats){const c=S.cats.find(c=>c.id===x.id);if(c){c.name=x.name;c.names=x.names;}}
-      S.coOcc=d.coOcc||{};S.genCount=d.genCount||0;S.archive=d.archive||[];
-      saveCats();saveStats();saveArchive();
-      renderPlayerPills();renderConstraints();updateHint();
-      showToast('Data importert','ok');
-    }catch(err){showToast('Kunne ikke lese filen');}
+    let d;
+    try{d=JSON.parse(e.target.result);}catch(err){showToast('Kunne ikke lese filen');return;}
+    if(!d||typeof d!=='object'||!Array.isArray(d.cats)){showToast('Ugyldig fil');return;}
+    // Valider før vi rører eksisterende data
+    const seen=new Set();
+    for(const x of d.cats){
+      if(!x||!S.cats.some(c=>c.id===x.id)||!Array.isArray(x.names)){showToast('Ugyldig fil: kategoriene stemmer ikke');return;}
+      for(const n of x.names){
+        if(typeof n!=='string'){showToast('Ugyldig fil: et navn er ikke tekst');return;}
+        if(seen.has(n)){showToast(`Ugyldig fil: "${n}" står i to kategorier`);return;}
+        seen.add(n);
+      }
+    }
+    if(!confirm('Erstatte all eksisterende data med importert data?'))return;
+    for(const x of d.cats){const c=S.cats.find(c=>c.id===x.id);if(c){if(typeof x.name==='string')c.name=x.name;c.names=x.names.slice();}}
+    S.coOcc=(d.coOcc&&typeof d.coOcc==='object')?d.coOcc:{};
+    S.opp=(d.opp&&typeof d.opp==='object')?d.opp:{};
+    S.genCount=parseInt(d.genCount)||0;
+    S.archive=Array.isArray(d.archive)?d.archive:[];
+    S.bindings=Array.isArray(d.bindings)?d.bindings.filter(b=>Array.isArray(b)&&b.length>=2):[];
+    S.excluded=new Set();
+    pruneBindings();
+    // Filer fra før oppmøtetellingen: utled tallene av arkivet
+    if(!d.opp&&S.archive.length)rebuildStatsFromArchive();
+    saveCats();saveStats();saveArchive();saveBindings();saveExcluded();
+    renderPlayerPills();renderConstraints();updateHint();renderStats();renderArchive();
+    showToast('Data importert','ok');
   };
   reader.readAsText(file);
   input.value='';
@@ -552,15 +693,22 @@ function importData(input){
 // ── Co-occ ──
 function ck(a,b){return[a,b].sort().join('|');}
 function gco(a,b){return S.coOcc[ck(a,b)]||0;}
+// Hvor mange økter har begge to vært med i? Uten tallet ville en spiller som
+// møter annenhver gang se ut som om hen «skylder» samspill med alle.
+// Eldre data uten oppmøtetall faller tilbake på «alle var med hver gang».
+function gopp(a,b){const v=S.opp[ck(a,b)];return v===undefined?S.genCount:v;}
 function recordGen(groups,matchDate){
-  for(const g of groups)for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){const k=ck(g[i].name,g[j].name);S.coOcc[k]=(S.coOcc[k]||0)+1;}
+  const gs=groups.filter(g=>g.length); // tomme lag skal ikke arkiveres
+  const tilstede=gs.flat();
+  for(let i=0;i<tilstede.length;i++)for(let j=i+1;j<tilstede.length;j++){const k=ck(tilstede[i].name,tilstede[j].name);S.opp[k]=(S.opp[k]||0)+1;}
+  for(const g of gs)for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){const k=ck(g[i].name,g[j].name);S.coOcc[k]=(S.coOcc[k]||0)+1;}
   S.genCount++;
   // Archive entry
   const entry={
     id:Date.now(),
-    matchDate:matchDate||new Date().toISOString().slice(0,10),
-    regDate:new Date().toISOString().slice(0,10),
-    groups:groups.map(g=>g.map(p=>({name:p.name,cat:p.cat})))
+    matchDate:matchDate||todayISO(),
+    regDate:todayISO(),
+    groups:gs.map(g=>g.map(p=>({name:p.name,cat:p.cat})))
   };
   S.archive.unshift(entry);
   saveStats();saveArchive();
@@ -588,12 +736,12 @@ function renderPlayerPills(){
   if(!all.length){cont.innerHTML=`<div class="no-players-hint">Legg til spillere i troppen for å komme i gang.</div>`;return;}
   cont.innerHTML=all.map(n=>{
     const out=S.excluded.has(n);
-    return`<button class="player-pill${out?' out':''}" onclick="togglePlayer('${js(n)}')">${h(n)}</button>`;
+    return`<button class="player-pill${out?' out':''}" onclick="togglePlayer('${h(js(n))}')">${h(n)}</button>`;
   }).join('');
   updateHint();
 }
-function togglePlayer(name){S.excluded.has(name)?S.excluded.delete(name):S.excluded.add(name);renderPlayerPills();}
-function includeAll(){S.excluded.clear();renderPlayerPills();}
+function togglePlayer(name){S.excluded.has(name)?S.excluded.delete(name):S.excluded.add(name);saveExcluded();renderPlayerPills();}
+function includeAll(){S.excluded.clear();saveExcluded();renderPlayerPills();}
 
 // ── Settings ──
 function setMode(m){S.mode=m;document.getElementById('modeCount').classList.toggle('active',m==='count');document.getElementById('modeSize').classList.toggle('active',m==='size');document.getElementById('numLabel').textContent=m==='count'?'Antall lag':'Spillere per lag';populateSelect();updateHint();}
@@ -628,9 +776,16 @@ function updateHint(){
 }
 
 // ── Constraints ──
+// Fjerner navn som ikke lenger finnes i troppen. Kalles der navn endres,
+// ikke som bieffekt av å tegne lista.
+function pruneBindings(){
+  const before=JSON.stringify(S.bindings);
+  const names=new Set(allNames());
+  S.bindings=S.bindings.map(b=>b.filter(n=>names.has(n))).filter(b=>b.length>=2);
+  if(JSON.stringify(S.bindings)!==before)saveBindings();
+}
 function renderConstraints(){
   const list=document.getElementById('constraintsList');const empty=document.getElementById('emptyHint');
-  S.bindings=S.bindings.map(b=>b.filter(n=>allNames().includes(n))).filter(b=>b.length>=2);
   if(!S.bindings.length){list.innerHTML='';empty.classList.remove('hidden');return;}
   empty.classList.add('hidden');
   list.innerHTML=S.bindings.map((b,i)=>`
@@ -639,13 +794,16 @@ function renderConstraints(){
       <button class="c-del" onclick="removeBinding(${i})">×</button>
     </div>`).join('');
 }
-function removeBinding(i){S.bindings.splice(i,1);renderConstraints();}
+function removeBinding(i){S.bindings.splice(i,1);saveBindings();renderConstraints();}
 
 // ── Pool modal ──
 function openPoolModal(){renderPoolGrid();document.getElementById('poolModal').classList.add('open');}
 function closePoolModal(){
   document.getElementById('poolModal').classList.remove('open');
-  for(const n of [...S.excluded])if(!allNames().includes(n))S.excluded.delete(n);
+  let changed=false;
+  for(const n of [...S.excluded])if(!allNames().includes(n)){S.excluded.delete(n);changed=true;}
+  if(changed)saveExcluded();
+  pruneBindings();
   renderPlayerPills();renderConstraints();
 }
 function handlePoolBackdrop(e){if(e.target===document.getElementById('poolModal'))closePoolModal();}
@@ -667,7 +825,35 @@ function renderPoolGrid(){
     </div>`).join('');
   updatePoolTotal();
 }
-function renderPoolNameList(cat){return cat.names.map((n,i)=>`<div class="pool-name-row" data-c="${cat.id}"><span>${h(n)}</span><button class="pool-name-del" onclick="removePoolName('${cat.id}',${i})">×</button></div>`).join('');}
+function renderPoolNameList(cat){
+  return cat.names.map((n,i)=>`<div class="pool-name-row" data-c="${cat.id}">
+    <span class="pool-name-text" title="${h(n)}">${h(n)}</span>
+    <div class="pool-row-right">
+      <button class="pool-row-btn" title="Bytt kategori" onclick="openCatMenu(event,'${cat.id}',${i})">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2.5 5.5h9m0 0L9 3m2.5 2.5L9 8M13.5 10.5h-9m0 0L7 8m-2.5 2.5L7 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="pool-name-del" onclick="removePoolName('${cat.id}',${i})">×</button>
+    </div>
+  </div>`).join('');
+}
+function openCatMenu(e,catId,idx){
+  e.stopPropagation();
+  const cat=S.cats.find(c=>c.id===catId);const name=cat&&cat.names[idx];
+  if(name===undefined)return;
+  showMenuAt(e.currentTarget,`<div class="move-menu-title">Flytt ${h(name)} til</div>`+
+    S.cats.filter(c=>c.id!==catId).map(c=>`<button onclick="movePlayerCat('${catId}',${idx},'${c.id}')">${h(c.name)}<span>${c.names.length} spillere</span></button>`).join(''));
+}
+// Bytter kategori uten å røre navnet, så all samspillshistorikk følger med
+function movePlayerCat(fromId,idx,toId){
+  closeMoveMenu();
+  if(fromId===toId)return;
+  const from=S.cats.find(c=>c.id===fromId),to=S.cats.find(c=>c.id===toId);
+  if(!from||!to)return;
+  const name=from.names[idx];if(name===undefined)return;
+  from.names.splice(idx,1);to.names.push(name);
+  saveCats();refreshPoolCat(fromId);refreshPoolCat(toId);
+  showToast(`${name} flyttet til ${to.name}`,'ok');
+}
 function refreshPoolCat(catId){
   const cat=S.cats.find(c=>c.id===catId);
   const list=document.getElementById(`pnl_${catId}`);if(list)list.innerHTML=renderPoolNameList(cat);
@@ -684,8 +870,9 @@ function addPoolName(catId){
 }
 function removePoolName(catId,idx){
   const cat=S.cats.find(c=>c.id===catId);const removed=cat.names[idx];cat.names.splice(idx,1);
-  S.bindings=S.bindings.map(b=>b.filter(n=>n!==removed)).filter(b=>b.length>=2);
-  S.excluded.delete(removed);saveCats();refreshPoolCat(catId);
+  saveCats();pruneBindings();
+  if(S.excluded.delete(removed))saveExcluded();
+  refreshPoolCat(catId);
 }
 
 // ── Bind modal ──
@@ -695,26 +882,26 @@ function openBindModal(){
   document.getElementById('bindModalBody').innerHTML=S.cats.map(cat=>{
     if(!cat.names.length)return'';
     return`<div class="modal-cat-section"><div class="modal-cat-title" data-c="${cat.id}">${h(cat.name)}</div>
-      <div class="modal-names">${cat.names.map(n=>`<button class="m-name-btn" data-c="${cat.id}" onclick="toggleSel(this,'${js(n)}')">${h(n)}</button>`).join('')}</div></div>`;}).join('');
+      <div class="modal-names">${cat.names.map(n=>`<button class="m-name-btn" data-c="${cat.id}" onclick="toggleSel(this,'${h(js(n))}')">${h(n)}</button>`).join('')}</div></div>`;}).join('');
   updateSelLabel();document.getElementById('bindModal').classList.add('open');
 }
 function closeBindModal(){document.getElementById('bindModal').classList.remove('open');}
 function handleBindBackdrop(e){if(e.target===document.getElementById('bindModal'))closeBindModal();}
 function toggleSel(btn,name){S.sel.has(name)?(S.sel.delete(name),btn.classList.remove('sel')):(S.sel.add(name),btn.classList.add('sel'));updateSelLabel();document.getElementById('confirmBtn').disabled=S.sel.size<2;}
 function updateSelLabel(){const n=S.sel.size;document.getElementById('selLabel').textContent=n===0?'Ingen valgt':n===1?'1 valgt':`${n} valgt`;}
-function addConstraint(){if(S.sel.size<2)return;S.bindings.push([...S.sel]);closeBindModal();renderConstraints();}
+function addConstraint(){if(S.sel.size<2)return;S.bindings.push([...S.sel]);saveBindings();closeBindModal();renderConstraints();}
 
 // ── Date modal ──
 function openDateModal(){
   const ap=activePlayers();if(ap.length<2){showToast('Minst 2 spillere må være med');return;}
   // Default to today
-  const today=new Date().toISOString().slice(0,10);
+  const today=todayISO();
   document.getElementById('matchDateInput').value=today;
   document.getElementById('dateModal').classList.add('open');
 }
 function closeDateModal(){document.getElementById('dateModal').classList.remove('open');}
 function runGenerate(){
-  S.currentMatchDate=document.getElementById('matchDateInput').value||new Date().toISOString().slice(0,10);
+  S.currentMatchDate=document.getElementById('matchDateInput').value||todayISO();
   closeDateModal();
   doGenerate();
 }
@@ -725,15 +912,46 @@ function calcGroups(tot){
   return S.mode==='count'?{numGroups:Math.min(n,tot),maxSize:Math.ceil(tot/Math.min(n,tot))}:{numGroups:Math.ceil(tot/Math.max(2,n)),maxSize:Math.max(2,n)};
 }
 
+// Gjør bindingene om til grupper som faktisk skal holde sammen:
+//  - navn som ikke er med i dag faller ut, resten av bindingen består
+//  - bindinger som deler en spiller slås sammen til én gruppe
+function bindingComponents(activeSet){
+  const parent=new Map();
+  const find=x=>{while(parent.get(x)!==x)x=parent.get(x);return x;};
+  const union=(a,b)=>{a=find(a);b=find(b);if(a!==b)parent.set(a,b);};
+  for(const b of S.bindings){
+    const act=b.filter(n=>activeSet.has(n));
+    for(const n of act)if(!parent.has(n))parent.set(n,n);
+    for(let i=1;i<act.length;i++)union(act[0],act[i]);
+  }
+  const byRoot=new Map();
+  for(const n of parent.keys()){
+    const r=find(n);
+    if(!byRoot.has(r))byRoot.set(r,[]);
+    byRoot.get(r).push(n);
+  }
+  return [...byRoot.values()].filter(c=>c.length>=2);
+}
+
+// Sjekker at hver bindingsgruppe faktisk endte på ett og samme lag
+function bindingsSatisfied(groups){
+  const gi=new Map();
+  groups.forEach((g,i)=>g.forEach(p=>gi.set(p.name,i)));
+  for(const c of bindingComponents(new Set(gi.keys()))){
+    const first=gi.get(c[0]);
+    if(c.some(n=>gi.get(n)!==first))return false;
+  }
+  return true;
+}
+
 function tryGenerate(people,numGroups,maxSize,forcedTogether,forcedApart){
   // forcedTogether: [[p,p], ...] pairs that MUST be in same group
   // forcedApart:   [[p,p], ...] pairs that MUST be in different groups
   const groups=Array.from({length:numGroups},()=>[]);const done=new Set();
   const activeSet=new Set(people.map(p=>p.name));
-  const validBindings=S.bindings.filter(b=>b.every(n=>activeSet.has(n)));
 
   // Merge forced-together into bindings-like list
-  const allBindings=[...validBindings.map(b=>b.map(n=>people.find(p=>p.name===n)).filter(Boolean))];
+  const allBindings=bindingComponents(activeSet).map(c=>c.map(n=>people.find(p=>p.name===n)).filter(Boolean));
   if(forcedTogether&&forcedTogether.length){
     for(const pair of forcedTogether) allBindings.push(pair);
   }
@@ -781,21 +999,61 @@ function distributeBalanced(groups,rem,maxSize,forcedApart){
   }
 }
 
-// Compute variance of all pairwise co-occurrences IF this grouping is applied
-function coVarScore(groups){
-  const all=groups.flat();
-  const n=all.length;
-  if(n<2)return 0;
-  const vals=[];
-  for(let i=0;i<n;i++){
-    for(let j=i+1;j<n;j++){
-      const base=gco(all[i].name,all[j].name);
-      const together=groups.some(g=>g.includes(all[i])&&g.includes(all[j]));
-      vals.push(together?base+1:base);
-    }
+// Variansen i alle parvise samspillstall HVIS denne inndelingen brukes.
+// Vi holder summen og kvadratsummen, slik at et bytte kan verdsettes
+// uten å regne ut hele scoren på nytt (se swapDelta).
+// Samspillstallene slås opp titusenvis av ganger per generering. Vi legger dem
+// derfor i en tabell med tallindeks, i stedet for å bygge en strengnøkkel hver gang.
+let CO=null;
+function buildCoMatrix(people){
+  const n=people.length;
+  people.forEach((p,i)=>{p._i=i;});
+  const m=new Float64Array(n*n),o=new Float64Array(n*n);
+  for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
+    const v=gco(people[i].name,people[j].name),w=gopp(people[i].name,people[j].name);
+    m[i*n+j]=v;m[j*n+i]=v;
+    o[i*n+j]=w;o[j*n+i]=w;
   }
-  const mean=vals.reduce((a,b)=>a+b,0)/vals.length;
-  return vals.reduce((s,v)=>s+(v-mean)*(v-mean),0)/vals.length;
+  CO={n,m,o};
+}
+function co(a,b){return(CO&&a._i!==undefined&&b._i!==undefined)?CO.m[a._i*CO.n+b._i]:gco(a.name,b.name);}
+function copp(a,b){return(CO&&a._i!==undefined&&b._i!==undefined)?CO.o[a._i*CO.n+b._i]:gopp(a.name,b.name);}
+
+// Verdien vi jevner ut er ANDELEN felles økter et par har vært på samme lag,
+// ikke antallet. Ellers ville de som møter sjelden trekke alle andre skjevt.
+// SMOOTH demper par med få felles økter: uten den ville et helt nytt par
+// hoppe mellom 0 og 1 og dominere regnestykket. PRIOR er sjansen for å havne
+// på samme lag ved ren tilfeldighet, og settes per generering.
+const SMOOTH=4;
+let PRIOR=0.25;
+function pairDen(a,b){return copp(a,b)+1+SMOOTH;}
+function pairVal(a,b,sammen){return(co(a,b)+(sammen?1:0)+SMOOTH*PRIOR)/pairDen(a,b);}
+
+function coStats(groups){
+  const all=[],gof=[];
+  groups.forEach((g,i)=>g.forEach(p=>{all.push(p);gof.push(i);}));
+  let sum=0,sumSq=0,m=0;
+  for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){
+    const v=pairVal(all[i],all[j],gof[i]===gof[j]);
+    sum+=v;sumSq+=v*v;m++;
+  }
+  return{sum,sumSq,m};
+}
+function varianceOf(sum,sumSq,m){return m?sumSq/m-(sum/m)*(sum/m):0;}
+function coVarScore(groups){const st=coStats(groups);return varianceOf(st.sum,st.sumSq,st.m);}
+function setPrior(tot,maxSize){PRIOR=tot>1?Math.min(.95,Math.max(.05,(maxSize-1)/(tot-1))):.25;}
+
+// Hvor mye endrer sum og kvadratsum seg hvis p1 og p2 bytter lag?
+// Bare par som involverer p1 eller p2 kan endre seg, altså O(lagstørrelse)
+// i stedet for O(alle par). Må kalles FØR byttet utføres.
+function swapDelta(g1,g2,p1,p2){
+  let dS=0,dQ=0;
+  // Å havne sammen løfter andelen med 1/nevner, ikke med 1
+  const on=(a,b)=>{const d=1/pairDen(a,b),v0=pairVal(a,b,false);dS+=d;dQ+=2*v0*d+d*d;};
+  const off=(a,b)=>{const d=1/pairDen(a,b),v1=pairVal(a,b,true);dS-=d;dQ+=d*d-2*v1*d;};
+  for(const x of g1){if(x===p1)continue;off(p1,x);on(p2,x);}
+  for(const y of g2){if(y===p2)continue;on(p1,y);off(p2,y);}
+  return{dS,dQ};
 }
 
 // Category balance variance
@@ -809,26 +1067,33 @@ function catBalanceScore(groups){
   return v;
 }
 
-// Local search: swap same-category players between groups to minimise co-occurrence variance
-function localSearch(groups,iters){
-  iters=iters||4000;
+// Lokalsøk: bytter spillere av samme kategori mellom lag for å jevne ut samspillet.
+// Spillere i "locked" er bundet til hverandre og røres ikke.
+function localSearch(groups,locked,iters){
   if(!Object.keys(S.coOcc).length)return groups;
-  let score=coVarScore(groups);
+  if(groups.length<2)return groups;
+  locked=locked||new Set();
+  const n=groups.flat().length;
+  iters=iters||Math.min(20000,3000+n*400);
+  const st=coStats(groups);
+  let cur=varianceOf(st.sum,st.sumSq,st.m);
   for(let it=0;it<iters;it++){
     const g1i=Math.floor(Math.random()*groups.length);
     let g2i;do{g2i=Math.floor(Math.random()*groups.length);}while(g2i===g1i);
     const g1=groups[g1i],g2=groups[g2i];
     if(!g1.length||!g2.length)continue;
-    const p1i=Math.floor(Math.random()*g1.length);
-    const p1=g1[p1i];
-    const samecat=g2.filter(p=>p.cat===p1.cat);
-    if(!samecat.length)continue;
-    const p2=samecat[Math.floor(Math.random()*samecat.length)];
-    const p2i=g2.indexOf(p2);
-    g1[p1i]=p2;g2[p2i]=p1;
-    const newScore=coVarScore(groups);
-    if(newScore<score){score=newScore;}
-    else{g1[p1i]=p1;g2[p2i]=p2;}
+    const cand1=g1.filter(p=>!locked.has(p.name));
+    if(!cand1.length)continue;
+    const p1=cand1[Math.floor(Math.random()*cand1.length)];
+    const cand2=g2.filter(p=>p.cat===p1.cat&&!locked.has(p.name));
+    if(!cand2.length)continue;
+    const p2=cand2[Math.floor(Math.random()*cand2.length)];
+    const{dS,dQ}=swapDelta(g1,g2,p1,p2);
+    const nv=varianceOf(st.sum+dS,st.sumSq+dQ,st.m);
+    if(nv<cur-1e-12){
+      g1[g1.indexOf(p1)]=p2;g2[g2.indexOf(p2)]=p1;
+      st.sum+=dS;st.sumSq+=dQ;cur=nv;
+    }
   }
   return groups;
 }
@@ -868,62 +1133,59 @@ function buildGroups(people,numGroups,maxSize){
   const{together,apart}=getForcedConstraints(people);
   const g=tryGenerate(people,numGroups,maxSize,together,apart);
   if(!g)return null;
-  return localSearch(g);
+  // Bundne spillere låses, slik at lokalsøket ikke river dem fra hverandre
+  const locked=new Set(bindingComponents(new Set(people.map(p=>p.name))).flat());
+  return localSearch(g,locked);
 }
 
 // ── Generate ──
-function doGenerate(){
-  const people=S.cats.flatMap(cat=>cat.names.filter(n=>!S.excluded.has(n)).map(n=>({name:n,cat:cat.id,catName:cat.name})));
-  const tot=people.length;if(tot<2){showToast('Minst 2 spillere må være med');return;}
-  const{numGroups,maxSize}=calcGroups(tot);
-  for(const b of S.bindings){const ab=b.filter(n=>!S.excluded.has(n));if(ab.length>maxSize){showToast(`En binding har ${ab.length} aktive spillere men maks er ${maxSize}`);return;}}
-  // Run 5 independent starts, keep the one with lowest co-occurrence variance
-  let best=null,bestScore=Infinity;
-  for(let i=0;i<5;i++){
-    const g=buildGroups(people,numGroups,maxSize);
-    if(!g)continue;
-    const s=coVarScore(g)+catBalanceScore(g)*10000;
-    if(s<bestScore){bestScore=s;best=g;}
-  }
-  if(!best){showToast('Kunne ikke generere lag. Sjekk bindingene.');return;}
-  best=best.map(g=>[...g].sort((a,b)=>catOrder(a.cat)-catOrder(b.cat)||a.name.localeCompare(b.name,'no')));
-  S.currentGroups=best.map(g=>g.map(p=>({...p})));
-  S.isSaved=false;
-  renderGroupsModal();
-  document.getElementById('resultsModal').classList.add('open');
+function activePeople(){
+  return S.cats.flatMap(cat=>cat.names.filter(n=>!S.excluded.has(n)).map(n=>({name:n,cat:cat.id,catName:cat.name})));
 }
+function sortGroup(g){return g.sort((a,b)=>catOrder(a.cat)-catOrder(b.cat)||a.name.localeCompare(b.name,'no'));}
 
-function reGenerate(){
-  const people=S.cats.flatMap(cat=>cat.names.filter(n=>!S.excluded.has(n)).map(n=>({name:n,cat:cat.id,catName:cat.name})));
-  const tot=people.length;if(tot<2)return;
+function generateTeams(){
+  const people=activePeople();
+  const tot=people.length;if(tot<2){showToast('Minst 2 spillere må være med');return false;}
   const{numGroups,maxSize}=calcGroups(tot);
+  for(const c of bindingComponents(new Set(people.map(p=>p.name)))){
+    if(c.length>maxSize){showToast(`${c.join(' + ')} skal spille sammen (${c.length} stk), men et lag har bare plass til ${maxSize}`);return false;}
+  }
+  // Run 5 independent starts, keep the one with lowest co-occurrence variance
+  setPrior(tot,maxSize);
+  buildCoMatrix(people);
   let best=null,bestScore=Infinity;
   for(let i=0;i<5;i++){
     const g=buildGroups(people,numGroups,maxSize);
-    if(!g)continue;
+    if(!g||!bindingsSatisfied(g))continue; // aldri vis et resultat som bryter en binding
     const s=coVarScore(g)+catBalanceScore(g)*10000;
     if(s<bestScore){bestScore=s;best=g;}
   }
-  if(!best){showToast('Kunne ikke generere lag.');return;}
-  best=best.map(g=>[...g].sort((a,b)=>catOrder(a.cat)-catOrder(b.cat)||a.name.localeCompare(b.name,'no')));
-  S.currentGroups=best.map(g=>g.map(p=>({...p})));
+  CO=null;
+  if(!best){showToast('Kunne ikke generere lag. Sjekk bindingene.');return false;}
+  S.currentGroups=best.filter(g=>g.length).map(g=>sortGroup(g.map(p=>({name:p.name,cat:p.cat,catName:p.catName}))));
+  S.shareSeed=1+Math.floor(Math.random()*1e9); // nytt stokkefrø per generering
   S.isSaved=false;
   renderGroupsModal();
+  return true;
 }
+function doGenerate(){if(generateTeams())document.getElementById('resultsModal').classList.add('open');}
+function reGenerate(){generateTeams();}
 
 function closeResultsModal(){document.getElementById('resultsModal').classList.remove('open');}
 
 // ── Save ──
 function saveToStats(){
   if(!S.currentGroups.length)return;
+  if(S.isSaved){showToast('Denne økta er allerede lagret');return;}
   recordGen(S.currentGroups,S.currentMatchDate);
   S.isSaved=true;updateSaveBtn();
   showToast('Lagret i statistikk','ok');
 }
 function updateSaveBtn(){
   const btn=document.getElementById('btnSave');const badge=document.getElementById('unsavedBadge');
-  if(S.isSaved){btn.textContent='✓ Lagret';btn.classList.add('saved');badge.classList.add('hidden');}
-  else{btn.textContent='Lagre i statistikk';btn.classList.remove('saved');badge.classList.remove('hidden');}
+  if(S.isSaved){btn.innerHTML='✓ Lagret';btn.classList.add('saved');badge.classList.add('hidden');}
+  else{btn.innerHTML='Lagre<span class="lbl"> i statistikk</span>';btn.classList.remove('saved');badge.classList.remove('hidden');}
 }
 
 // ── Render groups in modal ──
@@ -939,18 +1201,74 @@ function renderGroupsModal(){
         <div class="group-head-count">Antall spillere: ${g.length}</div>
       </div>
       <div class="group-body" id="gb_${gi}">
-        ${g.map((p,pi)=>`<div class="member-row" draggable="true" ondragstart="onDragStart(event,${gi},${pi})" ondragend="onDragEnd()">
+        ${displayOrder(g,S.shareSeed).map(pi=>{const p=g[pi];return`<div class="member-row" draggable="true" title="Trykk for å flytte til et annet lag" onclick="openMoveMenu(event,${gi},${pi})" ondragstart="onDragStart(event,${gi},${pi})" ondragend="onDragEnd()">
           <span class="drag-handle">⠿</span><div class="m-dot" data-c="${p.cat}"></div><span>${h(p.name)}</span>
-        </div>`).join('')}
+        </div>`;}).join('')}
         <div class="group-drop-hint">Slipp her</div>
       </div>
       <div class="group-footer">${S.cats.filter(c=>cc[c.id]>0).map(c=>`<span class="cat-count-pill" data-c="${c.id}">${cc[c.id]} ${h(c.name)}</span>`).join('')}</div>
     </div>`;}).join('');
 }
+// I delevisning stokkes navnene, ellers ville rekkefølgen (A først, C sist)
+// røpe kategoriene selv om prikkene er skjult. Rekkefølgen utledes av et frø
+// og navnet, så den er tilfeldig, men stabil: visningen hopper ikke rundt
+// hver gang noe tegnes opp på nytt.
+function hashKey(seed,name){
+  let hv=(2166136261^seed)>>>0;
+  const s=String(name);
+  for(let i=0;i<s.length;i++)hv=Math.imul(hv^s.charCodeAt(i),16777619)>>>0;
+  // Uten denne etterblandingen henger de øverste bitene igjen i navnelengden,
+  // og korte navn havner systematisk først
+  hv^=hv>>>16;hv=Math.imul(hv,2246822507)>>>0;
+  hv^=hv>>>13;hv=Math.imul(hv,3266489909)>>>0;
+  hv^=hv>>>16;
+  return hv/4294967296;
+}
+function displayOrder(g,seed){
+  const idx=g.map((_,i)=>i);
+  if(S.shareMode)idx.sort((a,b)=>hashKey(seed,g[a].name)-hashKey(seed,g[b].name));
+  return idx;
+}
+
+// ── Flytt spiller: meny (fungerer med berøring) ──
+function showMenuAt(anchor,html){
+  const menu=document.getElementById('moveMenu');
+  menu.innerHTML=html;
+  menu.classList.add('open');
+  const rect=anchor.getBoundingClientRect();
+  let left=rect.left,top=rect.bottom+4;
+  if(left+menu.offsetWidth>window.innerWidth-8)left=window.innerWidth-menu.offsetWidth-8;
+  if(top+menu.offsetHeight>window.innerHeight-8)top=Math.max(8,rect.top-menu.offsetHeight-4);
+  menu.style.left=Math.max(8,left)+'px';menu.style.top=top+'px';
+}
+function openMoveMenu(e,gi,pi){
+  e.stopPropagation();
+  if(Date.now()-lastDragEnd<400)return; // ikke åpne menyen rett etter en dra-operasjon
+  const p=S.currentGroups[gi]&&S.currentGroups[gi][pi];if(!p)return;
+  const targets=S.currentGroups.map((g,i)=>i).filter(i=>i!==gi);
+  if(!targets.length)return;
+  showMenuAt(e.currentTarget,`<div class="move-menu-title">Flytt ${h(p.name)} til</div>`+
+    targets.map(i=>`<button onclick="moveMember(${gi},${pi},${i})">Lag ${i+1}<span>${S.currentGroups[i].length} spillere</span></button>`).join(''));
+}
+function closeMoveMenu(){document.getElementById('moveMenu').classList.remove('open');}
+function moveMember(gi,pi,toGi){
+  closeMoveMenu();
+  const p=S.currentGroups[gi]&&S.currentGroups[gi][pi];if(!p)return;
+  S.currentGroups[gi].splice(pi,1);
+  S.currentGroups[toGi].push(p);
+  sortGroup(S.currentGroups[toGi]);
+  S.isSaved=false;
+  renderGroupsModal();
+  warnIfBindingBroken();
+}
+// Manuelle flyttinger overstyrer bindingene, men da skal det sies fra
+function warnIfBindingBroken(){
+  if(!bindingsSatisfied(S.currentGroups))showToast('Merk: nå er en binding brutt');
+}
 
 // ── Drag and drop ──
-function onDragStart(e,gi,pi){drag={person:S.currentGroups[gi][pi],fromGroup:gi,el:e.currentTarget};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','');setTimeout(()=>drag.el?.classList.add('is-dragging'),0);}
-function onDragEnd(){drag.el?.classList.remove('is-dragging');drag={person:null,fromGroup:-1,el:null};document.querySelectorAll('.group-card.drag-over').forEach(el=>el.classList.remove('drag-over'));document.querySelectorAll('.group-body.drag-over-body').forEach(el=>el.classList.remove('drag-over-body'));}
+function onDragStart(e,gi,pi){drag={person:S.currentGroups[gi][pi],fromGroup:gi,el:e.currentTarget};closeMoveMenu();e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','');setTimeout(()=>drag.el?.classList.add('is-dragging'),0);}
+function onDragEnd(){lastDragEnd=Date.now();drag.el?.classList.remove('is-dragging');drag={person:null,fromGroup:-1,el:null};document.querySelectorAll('.group-card.drag-over').forEach(el=>el.classList.remove('drag-over'));document.querySelectorAll('.group-body.drag-over-body').forEach(el=>el.classList.remove('drag-over-body'));}
 function onDragOver(e,gi){if(!drag.person||drag.fromGroup===gi)return;e.preventDefault();e.dataTransfer.dropEffect='move';document.getElementById(`gc_${gi}`)?.classList.add('drag-over');document.getElementById(`gb_${gi}`)?.classList.add('drag-over-body');}
 function onDragLeave(e,gi){if(e.currentTarget.contains(e.relatedTarget))return;document.getElementById(`gc_${gi}`)?.classList.remove('drag-over');document.getElementById(`gb_${gi}`)?.classList.remove('drag-over-body');}
 function onDrop(e,toGroup){
@@ -959,9 +1277,46 @@ function onDrop(e,toGroup){
   S.currentGroups[from]=S.currentGroups[from].filter(p=>p.name!==person.name);
   S.currentGroups[toGroup].push(person);
   // Re-sort target group
-  S.currentGroups[toGroup].sort((a,b)=>catOrder(a.cat)-catOrder(b.cat)||a.name.localeCompare(b.name,'no'));
-  S.isSaved=false;drag={person:null,fromGroup:-1,el:null};
+  sortGroup(S.currentGroups[toGroup]);
+  S.isSaved=false;lastDragEnd=Date.now();drag={person:null,fromGroup:-1,el:null};
   renderGroupsModal();
+  warnIfBindingBroken();
+}
+
+// ── Delevisning og kopiering ──
+function toggleShareMode(){S.shareMode=!S.shareMode;applyShareMode();saveShare();if(S.archive.length&&document.getElementById('tab-archive').classList.contains('active'))renderArchive();if(S.currentGroups.length)renderGroupsModal();}
+function applyShareMode(){
+  document.body.classList.toggle('share-mode',S.shareMode);
+  for(const id of ['btnShare','btnShareArchive']){
+    const b=document.getElementById(id);
+    if(b)b.classList.toggle('on',S.shareMode);
+  }
+}
+function teamsAsText(){
+  const lines=[];
+  if(S.currentMatchDate)lines.push(fmtDate(S.currentMatchDate));
+  S.currentGroups.forEach((g,i)=>{
+    lines.push('');
+    lines.push(`Lag ${i+1}`);
+    // samme rekkefølge som på skjermen: stokket i delevisning
+    for(const pi of displayOrder(g,S.shareSeed))lines.push(`- ${g[pi].name}`);
+  });
+  return lines.join('\n').trim();
+}
+function copyTeams(){
+  if(!S.currentGroups.length)return;
+  const txt=teamsAsText(); // aldri med kategorier: teksten er laget for å deles
+  const ok=()=>showToast('Lagene er kopiert','ok');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(ok).catch(()=>copyFallback(txt,ok));
+  }else copyFallback(txt,ok);
+}
+function copyFallback(txt,ok){
+  const ta=document.createElement('textarea');
+  ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.top='0';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,txt.length);
+  try{document.execCommand('copy')?ok():showToast('Kunne ikke kopiere');}catch(e){showToast('Kunne ikke kopiere');}
+  document.body.removeChild(ta);
 }
 
 // ── Statistics ──
@@ -972,22 +1327,36 @@ function renderStats(){
   const names=S.cats.flatMap(c=>c.names.map(n=>({name:n,cat:c.id})));
   if(!S.genCount||names.length<2){cont.innerHTML=`<div class="stats-empty">Lagre lag for å bygge opp statistikk.</div>`;return;}
 
+  // Et par måles på ANDELEN av de øktene begge var med i, ikke på antallet.
+  // Ellers ville de som møter sjelden alltid ligge nederst på lista.
   const pairs=[];
-  for(let i=0;i<names.length;i++)for(let j=i+1;j<names.length;j++){const v=gco(names[i].name,names[j].name);pairs.push({n1:names[i],n2:names[j],val:v});}
-  const act=pairs.filter(p=>p.val>0).length;const avg=pairs.length?(pairs.reduce((s,p)=>s+p.val,0)/pairs.length).toFixed(1):0;
-  const maxV=pairs.length?Math.max(...pairs.map(p=>p.val)):0;
+  for(let i=0;i<names.length;i++)for(let j=i+1;j<names.length;j++){
+    const felles=gopp(names[i].name,names[j].name);
+    const sammen=gco(names[i].name,names[j].name);
+    pairs.push({n1:names[i],n2:names[j],sammen,felles,andel:felles?sammen/felles:0});
+  }
+  const medData=pairs.filter(p=>p.felles>0);
+  if(!medData.length){cont.innerHTML=`<div class="stats-empty">Ingen av spillerne har vært med i samme økt ennå.</div>`;return;}
+  const pst=v=>Math.round(v*100)+' %';
+  const act=medData.filter(p=>p.sammen>0).length;
+  const snitt=medData.reduce((s,p)=>s+p.andel,0)/medData.length;
+  const maxA=Math.max(...medData.map(p=>p.andel));
 
   const metrics=`<div class="stats-metrics">
     <div class="metric-card"><div class="metric-label">Økter lagret</div><div class="metric-value">${S.genCount}</div></div>
-    <div class="metric-card"><div class="metric-label">Par med kontakt</div><div class="metric-value">${act}</div><div class="metric-sub">av ${pairs.length} (${pairs.length?Math.round(act/pairs.length*100):0}%)</div></div>
-    <div class="metric-card"><div class="metric-label">Snitt per par</div><div class="metric-value">${avg}</div><div class="metric-sub">ganger</div></div>
-    <div class="metric-card"><div class="metric-label">Maks ett par</div><div class="metric-value">${maxV}</div><div class="metric-sub">ganger</div></div>
+    <div class="metric-card"><div class="metric-label">Par med kontakt</div><div class="metric-value">${act}</div><div class="metric-sub">av ${medData.length} (${Math.round(act/medData.length*100)}%)</div></div>
+    <div class="metric-card"><div class="metric-label">Snitt sammen</div><div class="metric-value">${pst(snitt)}</div><div class="metric-sub">av felles økter</div></div>
+    <div class="metric-card"><div class="metric-label">Høyeste par</div><div class="metric-value">${pst(maxA)}</div><div class="metric-sub">av felles økter</div></div>
   </div>`;
 
-  const most=[...pairs].sort((a,b)=>b.val-a.val).slice(0,10);
-  const least=[...pairs].sort((a,b)=>a.val-b.val).slice(0,10);
-  function pRow(p,hi){const cls=hi&&p.val>0?'hi':(!hi&&p.val===0?'lo':'');return`<div class="pair-item"><span class="c-badge" data-c="${p.n1.cat}">${h(trunc(p.n1.name,14))}</span><span style="color:var(--hint);font-size:.7rem">og</span><span class="c-badge" data-c="${p.n2.cat}">${h(trunc(p.n2.name,14))}</span><span class="pair-count ${cls}">${p.val===1?'1 gang':`${p.val} ganger`}</span></div>`;}
-  const pairsHtml=`<div class="pairs-grid">
+  const most=[...medData].sort((a,b)=>b.andel-a.andel||b.felles-a.felles).slice(0,10);
+  const least=[...medData].sort((a,b)=>a.andel-b.andel||b.felles-a.felles).slice(0,10);
+  function pRow(p,hi){
+    const cls=hi&&p.sammen>0?'hi':(!hi&&p.sammen===0?'lo':'');
+    return`<div class="pair-item"><span class="c-badge" data-c="${p.n1.cat}">${h(trunc(p.n1.name,14))}</span><span style="color:var(--hint);font-size:.7rem">og</span><span class="c-badge" data-c="${p.n2.cat}">${h(trunc(p.n2.name,14))}</span><span class="pair-count ${cls}" title="${pst(p.andel)} av øktene begge var med i">${p.sammen} av ${p.felles}</span></div>`;
+  }
+  const pairsHtml=`<div class="stats-note">Tallet viser hvor mange ganger paret har vært på samme lag, av de øktene begge var med i.</div>
+  <div class="pairs-grid">
     <div class="pairs-col"><div class="pairs-col-title" style="color:var(--danger)">Mest på samme lag</div>${most.map(p=>pRow(p,true)).join('')}</div>
     <div class="pairs-col"><div class="pairs-col-title" style="color:var(--primary)">Sjeldnest på samme lag</div>${least.map(p=>pRow(p,false)).join('')}</div>
   </div>`;
@@ -1016,7 +1385,7 @@ function renderArchive(){
         <div class="archive-groups">${entry.groups.map((g,gi)=>`
           <div class="archive-group">
             <div class="archive-group-head"><span>Lag ${gi+1}</span><span>${g.length}</span></div>
-            <div class="archive-group-body">${g.map(p=>`<div class="archive-member"><div class="m-dot" data-c="${p.cat}"></div><span>${h(p.name)}</span></div>`).join('')}</div>
+            <div class="archive-group-body">${displayOrder(g,entry.id||ei).map(pi=>g[pi]).map(p=>`<div class="archive-member"><div class="m-dot" data-c="${p.cat}"></div><span>${h(p.name)}</span></div>`).join('')}</div>
           </div>`).join('')}
         </div>
       </div>
@@ -1027,21 +1396,39 @@ function toggleArchiveItem(ei){
   const isOpen=body.classList.toggle('open');chev.classList.toggle('open',isOpen);
 }
 function deleteArchiveEntry(ei){
-  if(!confirm('Slette denne oppføringen fra arkivet?'))return;
-  S.archive.splice(ei,1);saveArchive();renderArchive();
+  if(!confirm('Slette denne oppføringen? Statistikken regnes ut på nytt uten den.'))return;
+  S.archive.splice(ei,1);saveArchive();
+  rebuildStatsFromArchive(); // ellers ville statistikken fortsatt telle den slettede økta
+  renderArchive();
+  showToast('Slettet, og statistikken er oppdatert','ok');
 }
 function deleteAllArchive(){
   if(!S.archive.length)return;
-  if(!confirm('Slette hele arkivet? Dette kan ikke angres.'))return;
-  S.archive=[];saveArchive();renderArchive();
+  if(!confirm('Slette hele arkivet? Statistikken nullstilles samtidig. Dette kan ikke angres.'))return;
+  S.archive=[];saveArchive();rebuildStatsFromArchive();renderArchive();
 }
 
 // ── Toast ──
 let tTimer;
 function showToast(msg,type='err'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type==='ok'?' ok':'')+' show';clearTimeout(tTimer);tTimer=setTimeout(()=>t.classList.remove('show'),3200);}
 
+// ── Global lukking ──
+document.addEventListener('click',closeMoveMenu);
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  const menu=document.getElementById('moveMenu');
+  if(menu.classList.contains('open')){closeMoveMenu();return;}
+  for(const[id,close] of [['dateModal',closeDateModal],['bindModal',closeBindModal],['poolModal',closePoolModal],['resultsModal',closeResultsModal]]){
+    if(document.getElementById(id).classList.contains('open')){close();return;}
+  }
+});
+
 // ── Init ──
-loadCats();loadStats();loadArchive();
+loadCats();loadArchive();loadStats();loadBindings();loadExcluded();loadShare();
+if(S.needsOppRebuild){rebuildStatsFromArchive();delete S.needsOppRebuild;}
+pruneBindings();
+S.excluded=new Set([...S.excluded].filter(n=>allNames().includes(n)));
+applyShareMode();
 S.num=2; // default: 2 lag
 renderPlayerPills();renderConstraints();populateSelect();updateHint();
 
