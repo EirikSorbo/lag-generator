@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Gruppe-gen.">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#1b2f5e">
+  <meta name="theme-color" content="#1d4ed8">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="icon" href="icon-192.png" type="image/png">
@@ -22,7 +22,7 @@
       --bg:#eef2f8;--surface:#f7f9fc;--card:#fff;--border:#dee5ef;--border-strong:#b6c1d2;
       --text:#111827;--muted:#647087;--hint:#97a2b6;
       /* --primary er det man trykker på, --primary-deep er de store flatene */
-      --primary:#2563eb;--primary-hover:#1d4ed8;--primary-light:#e6edfe;--primary-deep:#1b2f5e;
+      --primary:#2563eb;--primary-hover:#1d4ed8;--primary-light:#e6edfe;--primary-deep:#1d4ed8;
       --danger:#d13438;--danger-strong:#a52a2e;--danger-bg:#fdf1f1;--danger-bg-hover:#fbe4e4;
       --danger-border:#f2c2c3;--danger-border-hover:#e79a9c;
       --success:#15803d;--success-bg:#c9ead6;--warn:#f5c451;
@@ -40,15 +40,15 @@
     .header-left{display:flex;gap:.35rem;align-items:center;flex:1}
     .header-center{flex:1;text-align:center}
     .header-right{flex:1;display:flex;justify-content:flex-end;align-items:center}
-    .version{font-size:.68rem;opacity:.4;font-weight:400;letter-spacing:.03em}
+    .version{font-size:.68rem;opacity:.6;font-weight:400;letter-spacing:.03em}
     .header-center h1{font-size:1.6rem;font-weight:600;letter-spacing:-.4px}
-    .io-btn-sm{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.55);padding:2px;transition:color .15s;line-height:1}
+    .io-btn-sm{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.78);padding:2px;transition:color .15s;line-height:1}
     .io-btn-sm:hover{color:#fff}
     .io-btn-sm svg{display:block}
 
     /* Tabs */
-    .tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.15);margin-top:.25rem}
-    .tab-btn{flex:1;padding:.6rem .5rem;background:none;border:none;color:rgba(255,255,255,.55);font-family:inherit;font-size:.82rem;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.01em}
+    .tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.25);margin-top:.25rem}
+    .tab-btn{flex:1;padding:.6rem .5rem;background:none;border:none;color:rgba(255,255,255,.82);font-family:inherit;font-size:.82rem;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.01em}
     .tab-btn.active{color:#fff;border-bottom-color:#fff}
 
     /* Content */
@@ -121,14 +121,14 @@
     .modal-head{background:var(--primary-deep);color:#fff;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
     .modal-head-left{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
     .modal-head-title{font-size:.95rem;font-weight:600}
-    .modal-head-date{font-size:.8rem;opacity:.7}
+    .modal-head-date{font-size:.8rem;opacity:.85}
     .modal-head-actions{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
     .btn-modal-regen{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .875rem;font-family:inherit;font-size:.82rem;font-weight:500;border:1px solid rgba(255,255,255,.3);border-radius:var(--radius-xs);background:rgba(255,255,255,.12);color:#fff;cursor:pointer;transition:all .15s}
     .btn-modal-regen:hover{background:rgba(255,255,255,.22)}
     .btn-modal-save{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem 1rem;font-family:inherit;font-size:.82rem;font-weight:600;border:none;border-radius:var(--radius-xs);background:#fff;color:var(--primary);cursor:pointer;transition:all .15s}
     .btn-modal-save:hover{background:var(--primary-light)}
     .btn-modal-save.saved{background:var(--success-bg);color:var(--success)}
-    .btn-modal-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.6);font-size:1.3rem;line-height:1;padding:.1rem;flex-shrink:0;transition:color .15s}
+    .btn-modal-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.8);font-size:1.3rem;line-height:1;padding:.1rem;flex-shrink:0;transition:color .15s}
     .btn-modal-close:hover{color:#fff}
     .unsaved-badge{font-size:.72rem;font-weight:500;color:var(--warn);display:inline-flex;align-items:center;gap:.3rem}
     .unsaved-dot{width:5px;height:5px;border-radius:50%;background:var(--warn)}
@@ -141,7 +141,7 @@
     .group-card.drag-over{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
     .group-head{padding:.55rem 1rem;background:var(--primary-deep);color:#fff;display:flex;align-items:center;justify-content:space-between}
     .group-head-title{font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
-    .group-head-count{font-size:.72rem;opacity:.75}
+    .group-head-count{font-size:.72rem;opacity:.88}
     .group-body{padding:.75rem 1rem;display:flex;flex-direction:column;gap:.3rem;min-height:44px}
     .group-body.drag-over-body{background:var(--primary-light)}
     .group-drop-hint{font-size:.72rem;color:var(--primary);opacity:.6;text-align:center;padding:.4rem 0;display:none}
@@ -347,7 +347,7 @@
       <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this)">
     </div>
     <div class="header-center"><h1>Gruppegenerator</h1></div>
-    <div class="header-right"><span class="version">v1.23</span></div>
+    <div class="header-right"><span class="version">v1.24</span></div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('main',this)">Generer</button>

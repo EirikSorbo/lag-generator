@@ -1,5 +1,5 @@
 // Service worker: gjør appen brukbar uten nett. Bump VERSION ved endringer.
-const VERSION = 'v1.23';
+const VERSION = 'v1.24';
 const SHELL   = 'gf-shell-' + VERSION;
 const RUNTIME = 'gf-runtime-' + VERSION;
 
