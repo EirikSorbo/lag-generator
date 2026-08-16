@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Gruppe-gen.">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#1b4a38">
+  <meta name="theme-color" content="#1b2f5e">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="icon" href="icon-192.png" type="image/png">
@@ -18,23 +18,28 @@
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap"></noscript>
   <style>
     :root {
-      --bg:#edeae4;--surface:#f5f3ef;--card:#fff;--border:#ddd9d3;--border-strong:#c4bfb8;
-      --text:#1a1917;--muted:#7a756f;--hint:#aaa59e;
-      --primary:#1b4a38;--primary-hover:#143829;--primary-light:#e2ede7;
-      --danger:#b83030;--success:#1b6b3a;
-      --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-      --shadow-md:0 4px 8px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
-      --shadow-lg:0 14px 32px rgba(0,0,0,.14),0 4px 12px rgba(0,0,0,.08);
+      /* Kjølige nøytraler mot en blå primærfarge */
+      --bg:#eef2f8;--surface:#f7f9fc;--card:#fff;--border:#dee5ef;--border-strong:#b6c1d2;
+      --text:#111827;--muted:#647087;--hint:#97a2b6;
+      /* --primary er det man trykker på, --primary-deep er de store flatene */
+      --primary:#2563eb;--primary-hover:#1d4ed8;--primary-light:#e6edfe;--primary-deep:#1b2f5e;
+      --danger:#d13438;--danger-strong:#a52a2e;--danger-bg:#fdf1f1;--danger-bg-hover:#fbe4e4;
+      --danger-border:#f2c2c3;--danger-border-hover:#e79a9c;
+      --success:#15803d;--success-bg:#c9ead6;--warn:#f5c451;
+      --shadow-sm:0 1px 3px rgba(15,30,60,.07),0 1px 2px rgba(15,30,60,.04);
+      --shadow-md:0 4px 8px rgba(15,30,60,.09),0 2px 4px rgba(15,30,60,.05);
+      --shadow-lg:0 14px 32px rgba(15,30,60,.16),0 4px 12px rgba(15,30,60,.09);
       --radius:12px;--radius-sm:8px;--radius-xs:6px;
-      --cat-a:#2058c8;--cat-a-bg:#edf2fc;--cat-a-border:#b8cef4;
-      --cat-b:#a84f0d;--cat-b-bg:#fdf4ee;--cat-b-border:#f5c9a8;
-      --cat-c:#7040d0;--cat-c-bg:#f2eefb;--cat-c-border:#d4c4f5;
+      /* Kategorifargene holder god avstand til blåtonen og til hverandre */
+      --cat-a:#0f766e;--cat-a-bg:#e6f5f3;--cat-a-border:#9ed7d0;
+      --cat-b:#b45309;--cat-b-bg:#fdf3e7;--cat-b-border:#f3ce9c;
+      --cat-c:#7c3aed;--cat-c-bg:#f2ecfe;--cat-c-border:#d2bffa;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;padding-bottom:80px}
 
     /* Header */
-    .header{background:var(--primary);color:#fff;padding:1.5rem 1.5rem 0;position:relative}
+    .header{background:var(--primary-deep);color:#fff;padding:1.5rem 1.5rem 0;position:relative}
     .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;gap:.5rem}
     .header-left{display:flex;gap:.35rem;align-items:center;flex:1}
     .header-center{flex:1;text-align:center}
@@ -58,8 +63,8 @@
     /* Section */
     .section{margin-bottom:1.75rem}
     .section-label{display:flex;align-items:center;gap:.75rem;margin-bottom:.875rem}
-    .btn-tropp-inline{font-family:inherit;font-size:.82rem;font-weight:600;color:#c0392b;background:#fdf2f2;border:1.5px solid #f5c0c0;border-radius:var(--radius-xs);padding:.45rem 1rem;cursor:pointer;transition:all .15s;white-space:nowrap;margin-left:auto}
-    .btn-tropp-inline:hover{background:#fbe8e8;border-color:#e8a0a0;color:#a93226}
+    .btn-tropp-inline{font-family:inherit;font-size:.82rem;font-weight:600;color:var(--danger);background:var(--danger-bg);border:1.5px solid var(--danger-border);border-radius:var(--radius-xs);padding:.45rem 1rem;cursor:pointer;transition:all .15s;white-space:nowrap;margin-left:auto}
+    .btn-tropp-inline:hover{background:var(--danger-bg-hover);border-color:var(--danger-border-hover);color:var(--danger-strong)}
     .step-num{width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;font-size:.75rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .section-title{font-size:.95rem;font-weight:600}
     .card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow-sm);padding:1.25rem}
@@ -88,6 +93,8 @@
     .c-badge[data-c=a]{background:var(--cat-a-bg);color:var(--cat-a);border-color:var(--cat-a-border)}
     .c-badge[data-c=b]{background:var(--cat-b-bg);color:var(--cat-b);border-color:var(--cat-b-border)}
     .c-badge[data-c=c]{background:var(--cat-c-bg);color:var(--cat-c);border-color:var(--cat-c-border)}
+    .c-sep{font-size:.72rem;color:var(--hint);align-self:center;padding:0 .1rem}
+    .constraint-item.apart{border-style:dashed;border-color:var(--danger-border);background:var(--danger-bg)}
     .c-del{background:none;border:none;cursor:pointer;color:var(--muted);opacity:.45;padding:0 0 0 .625rem;font-size:1.1rem;transition:opacity .15s;flex-shrink:0}
     .c-del:hover{opacity:1;color:var(--danger)}
     .empty-hint{font-size:.85rem;color:var(--hint);font-style:italic;margin-bottom:.875rem}
@@ -102,7 +109,7 @@
     .player-pills{display:flex;flex-wrap:wrap;gap:.4rem}
     .player-pill{padding:.3rem .75rem;border-radius:99px;font-family:inherit;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .15s;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);line-height:1.4}
     .player-pill:hover{border-color:var(--border-strong);color:var(--text)}
-    .player-pill.out{background:#fdf2f2;color:var(--danger);border-color:#f5c0c0;text-decoration:line-through}
+    .player-pill.out{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border);text-decoration:line-through}
     .no-players-hint{font-size:.85rem;color:var(--hint);font-style:italic}
 
     /* Bottom row */
@@ -117,7 +124,7 @@
     .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;overflow-y:auto;padding:1rem}
     .modal-backdrop.open{display:block}
     .modal-box{background:var(--card);border-radius:var(--radius);max-width:900px;margin:auto;box-shadow:var(--shadow-lg);overflow:hidden}
-    .modal-head{background:var(--primary);color:#fff;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .modal-head{background:var(--primary-deep);color:#fff;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
     .modal-head-left{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
     .modal-head-title{font-size:.95rem;font-weight:600}
     .modal-head-date{font-size:.8rem;opacity:.7}
@@ -125,12 +132,12 @@
     .btn-modal-regen{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .875rem;font-family:inherit;font-size:.82rem;font-weight:500;border:1px solid rgba(255,255,255,.3);border-radius:var(--radius-xs);background:rgba(255,255,255,.12);color:#fff;cursor:pointer;transition:all .15s}
     .btn-modal-regen:hover{background:rgba(255,255,255,.22)}
     .btn-modal-save{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem 1rem;font-family:inherit;font-size:.82rem;font-weight:600;border:none;border-radius:var(--radius-xs);background:#fff;color:var(--primary);cursor:pointer;transition:all .15s}
-    .btn-modal-save:hover{background:#e8f0eb}
-    .btn-modal-save.saved{background:#b8dfcb;color:var(--success)}
+    .btn-modal-save:hover{background:var(--primary-light)}
+    .btn-modal-save.saved{background:var(--success-bg);color:var(--success)}
     .btn-modal-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.6);font-size:1.3rem;line-height:1;padding:.1rem;flex-shrink:0;transition:color .15s}
     .btn-modal-close:hover{color:#fff}
-    .unsaved-badge{font-size:.72rem;font-weight:500;color:#f0d080;display:inline-flex;align-items:center;gap:.3rem}
-    .unsaved-dot{width:5px;height:5px;border-radius:50%;background:#f0d080}
+    .unsaved-badge{font-size:.72rem;font-weight:500;color:var(--warn);display:inline-flex;align-items:center;gap:.3rem}
+    .unsaved-dot{width:5px;height:5px;border-radius:50%;background:var(--warn)}
     .modal-body{padding:1.25rem}
     .edit-hint{font-size:.75rem;color:var(--hint);margin-bottom:.875rem}
 
@@ -138,7 +145,7 @@
     .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:1rem}
     .group-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:border-color .15s,box-shadow .15s}
     .group-card.drag-over{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
-    .group-head{padding:.55rem 1rem;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:space-between}
+    .group-head{padding:.55rem 1rem;background:var(--primary-deep);color:#fff;display:flex;align-items:center;justify-content:space-between}
     .group-head-title{font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
     .group-head-count{font-size:.72rem;opacity:.75}
     .group-body{padding:.75rem 1rem;display:flex;flex-direction:column;gap:.3rem;min-height:44px}
@@ -183,7 +190,7 @@
     .stats-title{font-size:1rem;font-weight:600}
     .stats-sub{font-size:.8rem;color:var(--hint);margin-top:.15rem}
     .btn-reset{padding:.35rem .75rem;font-family:inherit;font-size:.78rem;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
-    .btn-reset:hover{border-color:var(--danger);color:var(--danger);background:#fdf2f2}
+    .btn-reset:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-bg)}
     .stats-empty{text-align:center;padding:3rem 1rem;color:var(--hint);font-size:.9rem}
     .stats-note{font-size:.78rem;color:var(--hint);margin-bottom:.875rem}
     .pairs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
@@ -212,13 +219,13 @@
     .archive-body.open{display:block}
     .archive-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.75rem}
     .archive-group{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden}
-    .archive-group-head{padding:.4rem .75rem;background:var(--primary);color:#fff;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between}
+    .archive-group-head{padding:.4rem .75rem;background:var(--primary-deep);color:#fff;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between}
     .archive-group-body{padding:.5rem .75rem;display:flex;flex-direction:column;gap:.2rem}
     .archive-member{display:flex;align-items:center;gap:.4rem;font-size:.8rem}
-    .archive-del{padding:.2rem .5rem;font-family:inherit;font-size:.72rem;color:var(--danger);background:transparent;border:1px solid #f5c0c0;border-radius:4px;cursor:pointer;margin-top:.5rem;display:block;width:100%;text-align:center;transition:background .15s}
-    .archive-del:hover{background:#fdf2f2}
-    .archive-del-btn{padding:.25rem .6rem;font-family:inherit;font-size:.72rem;font-weight:500;color:var(--danger);background:transparent;border:1px solid #f5c0c0;border-radius:4px;cursor:pointer;transition:background .15s;white-space:nowrap;flex-shrink:0}
-    .archive-del-btn:hover{background:#fdf2f2}
+    .archive-del{padding:.2rem .5rem;font-family:inherit;font-size:.72rem;color:var(--danger);background:transparent;border:1px solid var(--danger-border);border-radius:4px;cursor:pointer;margin-top:.5rem;display:block;width:100%;text-align:center;transition:background .15s}
+    .archive-del:hover{background:var(--danger-bg)}
+    .archive-del-btn{padding:.25rem .6rem;font-family:inherit;font-size:.72rem;font-weight:500;color:var(--danger);background:transparent;border:1px solid var(--danger-border);border-radius:4px;cursor:pointer;transition:background .15s;white-space:nowrap;flex-shrink:0}
+    .archive-del-btn:hover{background:var(--danger-bg)}
 
     /* Pool modal */
     .modal-backdrop-pool{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-start;justify-content:center;padding:1.5rem 1rem;overflow-y:auto}
@@ -356,7 +363,7 @@
       <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this)">
     </div>
     <div class="header-center"><h1>Gruppegenerator</h1></div>
-    <div class="header-right"><span class="version">v1.21</span></div>
+    <div class="header-right"><span class="version">v1.22</span></div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('main',this)">Generer</button>
@@ -394,12 +401,21 @@
       <div class="card">
         <div class="constraints-list" id="constraintsList"></div>
         <p class="empty-hint" id="emptyHint">Ingen bindinger lagt til ennå.</p>
-        <button class="btn-add-c" onclick="openBindModal()"><span style="font-size:1.1rem;line-height:1">+</span> Legg til binding</button>
+        <button class="btn-add-c" onclick="openBindModal('sammen')"><span style="font-size:1.1rem;line-height:1">+</span> Legg til binding</button>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-label"><div class="step-num">3</div><span class="section-title">Skal utelates</span></div>
+      <div class="section-label"><div class="step-num">3</div><span class="section-title">Skal ikke spille sammen</span></div>
+      <div class="card">
+        <div class="constraints-list" id="apartList"></div>
+        <p class="empty-hint" id="apartEmptyHint">Ingen er satt til å holdes fra hverandre ennå.</p>
+        <button class="btn-add-c" onclick="openBindModal('ikke')"><span style="font-size:1.1rem;line-height:1">+</span> Legg til krav</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label"><div class="step-num">4</div><span class="section-title">Skal utelates</span></div>
       <div class="card">
         <div class="player-section-head">
           <span class="player-count-badge" id="playerCountBadge">Alle er med</span>
@@ -519,7 +535,7 @@
 <div class="bind-modal-backdrop" id="bindModal" onclick="handleBindBackdrop(event)">
   <div class="bind-modal-box">
     <div class="bind-modal-head">
-      <h2>Skal spille sammen</h2>
+      <h2 id="bindModalTitle">Skal spille sammen</h2>
       <button class="modal-close" onclick="closeBindModal()">×</button>
     </div>
     <div class="bind-modal-body">
@@ -544,7 +560,7 @@ const S = {
     {id:'b',name:'Kategori B',names:[]},
     {id:'c',name:'Kategori C',names:[]}
   ],
-  mode:'count', num:4, bindings:[], sel:new Set(),
+  mode:'count', num:4, bindings:[], apart:[], sel:new Set(), bindMode:'sammen',
   excluded:new Set(),
   coOcc:{}, opp:{}, genCount:0,
   archive:[],
@@ -594,6 +610,8 @@ function loadArchive(){try{const d=JSON.parse(localStorage.getItem('gf_archive')
 // Bindinger er semi-permanente og skal overleve en omlasting
 function saveBindings(){try{localStorage.setItem('gf_bindings',JSON.stringify(S.bindings));}catch(e){warnStorage();}}
 function loadBindings(){try{const d=JSON.parse(localStorage.getItem('gf_bindings')||'[]');S.bindings=Array.isArray(d)?d.filter(b=>Array.isArray(b)&&b.length>=2).map(b=>b.filter(n=>typeof n==='string')):[];}catch(e){S.bindings=[];}}
+function saveApart(){try{localStorage.setItem('gf_apart',JSON.stringify(S.apart));}catch(e){warnStorage();}}
+function loadApart(){try{const d=JSON.parse(localStorage.getItem('gf_apart')||'[]');S.apart=Array.isArray(d)?d.filter(b=>Array.isArray(b)&&b.length>=2).map(b=>b.filter(n=>typeof n==='string')):[];}catch(e){S.apart=[];}}
 // Utelatelser gjelder dagens økt: de overlever en omlasting, men ikke natta
 function saveExcluded(){try{localStorage.setItem('gf_excl',JSON.stringify({date:todayISO(),names:[...S.excluded]}));}catch(e){warnStorage();}}
 function loadExcluded(){try{const d=JSON.parse(localStorage.getItem('gf_excl')||'null');if(d&&d.date===todayISO()&&Array.isArray(d.names))S.excluded=new Set(d.names.filter(n=>typeof n==='string'));}catch(e){}}
@@ -633,10 +651,11 @@ function rebuildStatsClick(){
 // ── Export / Import ──
 function exportData(){
   const payload={
-    version:4,
+    version:5,
     exported:new Date().toISOString(),
     cats:S.cats.map(c=>({id:c.id,name:c.name,names:c.names})),
     bindings:S.bindings,
+    apart:S.apart,
     coOcc:S.coOcc,
     opp:S.opp,
     genCount:S.genCount,
@@ -678,11 +697,12 @@ function importData(input){
     S.genCount=parseInt(d.genCount)||0;
     S.archive=Array.isArray(d.archive)?d.archive:[];
     S.bindings=Array.isArray(d.bindings)?d.bindings.filter(b=>Array.isArray(b)&&b.length>=2):[];
+    S.apart=Array.isArray(d.apart)?d.apart.filter(b=>Array.isArray(b)&&b.length>=2):[];
     S.excluded=new Set();
     pruneBindings();
     // Filer fra før oppmøtetellingen: utled tallene av arkivet
     if(!d.opp&&S.archive.length)rebuildStatsFromArchive();
-    saveCats();saveStats();saveArchive();saveBindings();saveExcluded();
+    saveCats();saveStats();saveArchive();saveBindings();saveApart();saveExcluded();
     renderPlayerPills();renderConstraints();updateHint();renderStats();renderArchive();
     showToast('Data importert','ok');
   };
@@ -779,22 +799,30 @@ function updateHint(){
 // Fjerner navn som ikke lenger finnes i troppen. Kalles der navn endres,
 // ikke som bieffekt av å tegne lista.
 function pruneBindings(){
-  const before=JSON.stringify(S.bindings);
   const names=new Set(allNames());
+  const b0=JSON.stringify(S.bindings),a0=JSON.stringify(S.apart);
   S.bindings=S.bindings.map(b=>b.filter(n=>names.has(n))).filter(b=>b.length>=2);
-  if(JSON.stringify(S.bindings)!==before)saveBindings();
+  S.apart=S.apart.map(b=>b.filter(n=>names.has(n))).filter(b=>b.length>=2);
+  if(JSON.stringify(S.bindings)!==b0)saveBindings();
+  if(JSON.stringify(S.apart)!==a0)saveApart();
 }
 function renderConstraints(){
-  const list=document.getElementById('constraintsList');const empty=document.getElementById('emptyHint');
-  if(!S.bindings.length){list.innerHTML='';empty.classList.remove('hidden');return;}
+  tegnKravliste('constraintsList','emptyHint',S.bindings,'removeBinding','sammen');
+  tegnKravliste('apartList','apartEmptyHint',S.apart,'removeApart','ikke');
+}
+function tegnKravliste(listeId,tomId,krav,slettFn,type){
+  const list=document.getElementById(listeId),empty=document.getElementById(tomId);
+  if(!list||!empty)return;
+  if(!krav.length){list.innerHTML='';empty.classList.remove('hidden');return;}
   empty.classList.add('hidden');
-  list.innerHTML=S.bindings.map((b,i)=>`
-    <div class="constraint-item">
-      <div class="constraint-badges">${b.map(n=>{const cat=catFor(n);return`<span class="c-badge" data-c="${cat?.id||'a'}">${h(n)}</span>`;}).join('')}</div>
-      <button class="c-del" onclick="removeBinding(${i})">×</button>
+  list.innerHTML=krav.map((b,i)=>`
+    <div class="constraint-item${type==='ikke'?' apart':''}">
+      <div class="constraint-badges">${b.map(n=>{const cat=catFor(n);return`<span class="c-badge" data-c="${cat?.id||'a'}">${h(n)}</span>`;}).join('<span class="c-sep">og</span>')}</div>
+      <button class="c-del" onclick="${slettFn}(${i})">×</button>
     </div>`).join('');
 }
 function removeBinding(i){S.bindings.splice(i,1);saveBindings();renderConstraints();}
+function removeApart(i){S.apart.splice(i,1);saveApart();renderConstraints();}
 
 // ── Pool modal ──
 function openPoolModal(){renderPoolGrid();document.getElementById('poolModal').classList.add('open');}
@@ -876,8 +904,11 @@ function removePoolName(catId,idx){
 }
 
 // ── Bind modal ──
-function openBindModal(){
+function openBindModal(modus){
   if(totalCount()<2){showToast('Du trenger minst 2 spillere i troppen');return;}
+  S.bindMode=modus==='ikke'?'ikke':'sammen';
+  document.getElementById('bindModalTitle').textContent=S.bindMode==='ikke'?'Skal ikke spille sammen':'Skal spille sammen';
+  document.getElementById('confirmBtn').textContent=S.bindMode==='ikke'?'Legg til krav':'Legg til';
   S.sel=new Set();
   document.getElementById('bindModalBody').innerHTML=S.cats.map(cat=>{
     if(!cat.names.length)return'';
@@ -889,7 +920,22 @@ function closeBindModal(){document.getElementById('bindModal').classList.remove(
 function handleBindBackdrop(e){if(e.target===document.getElementById('bindModal'))closeBindModal();}
 function toggleSel(btn,name){S.sel.has(name)?(S.sel.delete(name),btn.classList.remove('sel')):(S.sel.add(name),btn.classList.add('sel'));updateSelLabel();document.getElementById('confirmBtn').disabled=S.sel.size<2;}
 function updateSelLabel(){const n=S.sel.size;document.getElementById('selLabel').textContent=n===0?'Ingen valgt':n===1?'1 valgt':`${n} valgt`;}
-function addConstraint(){if(S.sel.size<2)return;S.bindings.push([...S.sel]);saveBindings();closeBindModal();renderConstraints();}
+function addConstraint(){
+  if(S.sel.size<2)return;
+  const valgt=[...S.sel];
+  if(S.bindMode==='ikke'){
+    // Advar med én gang hvis kravet står mot en binding
+    const strid=valgt.find(a=>valgt.some(b=>a!==b&&S.bindings.some(bd=>bd.includes(a)&&bd.includes(b))));
+    if(strid){showToast(`${strid} er allerede satt til å spille sammen med en av disse`);return;}
+    if(valgt.length>Math.max(2,S.num)&&S.mode==='count'){showToast(`${valgt.length} spillere kan ikke holdes fra hverandre på ${S.num} lag`);return;}
+    S.apart.push(valgt);saveApart();
+  }else{
+    const strid=valgt.find(a=>valgt.some(b=>a!==b&&S.apart.some(ap=>ap.includes(a)&&ap.includes(b))));
+    if(strid){showToast(`${strid} er allerede satt til å ikke spille sammen med en av disse`);return;}
+    S.bindings.push(valgt);saveBindings();
+  }
+  closeBindModal();renderConstraints();
+}
 
 // ── Date modal ──
 function openDateModal(){
@@ -933,20 +979,51 @@ function bindingComponents(activeSet){
   return [...byRoot.values()].filter(c=>c.length>=2);
 }
 
-// Sjekker at hver bindingsgruppe faktisk endte på ett og samme lag
-function bindingsSatisfied(groups){
+// «Skal ikke spille sammen» som oppslag: navn -> alle hen ikke kan dele lag med.
+// Et sett på tre betyr at alle tre må på hvert sitt lag.
+function apartMap(activeSet){
+  const m=new Map();
+  const legg=(a,b)=>{if(!m.has(a))m.set(a,new Set());m.get(a).add(b);};
+  for(const grp of S.apart){
+    const act=grp.filter(n=>activeSet.has(n));
+    for(let i=0;i<act.length;i++)for(let j=i+1;j<act.length;j++){legg(act[i],act[j]);legg(act[j],act[i]);}
+  }
+  return m;
+}
+function apartGroups(activeSet){
+  return S.apart.map(g=>g.filter(n=>activeSet.has(n))).filter(g=>g.length>=2);
+}
+// Kan denne spilleren stå i dette laget? (unntatt er en som samtidig går ut)
+function canPlace(group,person,am,unntatt){
+  const fiender=am.get(person.name);
+  if(!fiender||!fiender.size)return true;
+  return !group.some(x=>x!==unntatt&&fiender.has(x.name));
+}
+function canPlaceAll(group,members,am){
+  return members.every(p=>canPlace(group,p,am)) &&
+    // to i samme binding kan ikke samtidig være «ikke sammen»
+    !members.some(p=>members.some(q=>q!==p&&am.get(p.name)&&am.get(p.name).has(q.name)));
+}
+
+// Sjekker at bindingene endte på samme lag OG at ingen «ikke sammen» er brutt
+function constraintsOk(groups){
   const gi=new Map();
   groups.forEach((g,i)=>g.forEach(p=>gi.set(p.name,i)));
-  for(const c of bindingComponents(new Set(gi.keys()))){
+  const aktive=new Set(gi.keys());
+  for(const c of bindingComponents(aktive)){
     const first=gi.get(c[0]);
     if(c.some(n=>gi.get(n)!==first))return false;
+  }
+  for(const g of apartGroups(aktive)){
+    const lag=g.map(n=>gi.get(n));
+    if(new Set(lag).size!==lag.length)return false;
   }
   return true;
 }
 
-function tryGenerate(people,numGroups,maxSize,forcedTogether,forcedApart){
+function tryGenerate(people,numGroups,maxSize,forcedTogether,am){
   // forcedTogether: [[p,p], ...] pairs that MUST be in same group
-  // forcedApart:   [[p,p], ...] pairs that MUST be in different groups
+  // am: oppslag over hvem som ikke kan dele lag
   const groups=Array.from({length:numGroups},()=>[]);const done=new Set();
   const activeSet=new Set(people.map(p=>p.name));
 
@@ -959,8 +1036,9 @@ function tryGenerate(people,numGroups,maxSize,forcedTogether,forcedApart){
   // Place all must-be-together groups first
   for(const members of allBindings.sort((a,b)=>b.length-a.length)){
     if(!members.length||members.some(p=>!p||done.has(p.name)))continue;
-    // For forced-apart: avoid groups that already have the "enemy"
-    const cands=groups.map((g,i)=>({i,space:maxSize-g.length})).filter(g=>g.space>=members.length);
+    // Bare lag som har plass OG som ikke allerede rommer en de skal unngå
+    const cands=groups.map((g,i)=>({i,space:maxSize-g.length}))
+      .filter(g=>g.space>=members.length&&canPlaceAll(groups[g.i],members,am));
     if(!cands.length)return null;
     // Prefer groups with most space
     cands.sort((a,b)=>b.space-a.space);
@@ -970,33 +1048,33 @@ function tryGenerate(people,numGroups,maxSize,forcedTogether,forcedApart){
     for(const p of members){groups[chosen.i].push(p);done.add(p.name);}
   }
 
-  distributeBalanced(groups,shuffle(people.filter(p=>!done.has(p.name))),maxSize,forcedApart);
+  if(!distributeBalanced(groups,shuffle(people.filter(p=>!done.has(p.name))),maxSize,am))return null;
   return groups;
 }
 
-function distributeBalanced(groups,rem,maxSize,forcedApart){
+function distributeBalanced(groups,rem,maxSize,am){
   const pool=[...rem];
   while(pool.length){
     const avail=groups.map((g,i)=>({i,space:maxSize-g.length})).filter(g=>g.space>0).sort((a,b)=>b.space-a.space);
     if(!avail.length)break;
-    const tg=groups[avail[0].i];
-    const catCnts={};for(const p of tg)catCnts[p.cat]=(catCnts[p.cat]||0)+1;
-    const poolCats=[...new Set(pool.map(p=>p.cat))];if(!poolCats.length)break;
-    poolCats.sort((a,b)=>(catCnts[a]||0)-(catCnts[b]||0));
-    let catPool=pool.filter(p=>p.cat===poolCats[0]);
-    // Respect forced-apart: exclude players whose "enemy" is already in this group
-    if(forcedApart&&forcedApart.length){
-      const enemyNames=new Set();
-      for(const[pa,pb] of forcedApart){
-        if(tg.find(x=>x.name===pa.name))enemyNames.add(pb.name);
-        if(tg.find(x=>x.name===pb.name))enemyNames.add(pa.name);
-      }
-      const filtered=catPool.filter(p=>!enemyNames.has(p.name));
-      if(filtered.length)catPool=filtered; // only apply if we have options
+    // Vanligvis fylles det tommeste laget, men det kan være sperret av et
+    // «ikke sammen»-krav. Da går vi videre til neste lag med plass.
+    let plassert=false;
+    for(const kand of avail){
+      const tg=groups[kand.i];
+      const lovlig=pool.filter(p=>canPlace(tg,p,am));
+      if(!lovlig.length)continue;
+      const catCnts={};for(const p of tg)catCnts[p.cat]=(catCnts[p.cat]||0)+1;
+      const poolCats=[...new Set(lovlig.map(p=>p.cat))];
+      poolCats.sort((a,b)=>(catCnts[a]||0)-(catCnts[b]||0));
+      const catPool=lovlig.filter(p=>p.cat===poolCats[0]);
+      const chosen=catPool[Math.floor(Math.random()*catPool.length)];
+      tg.push(chosen);pool.splice(pool.indexOf(chosen),1);
+      plassert=true;break;
     }
-    const chosen=catPool[Math.floor(Math.random()*catPool.length)];
-    tg.push(chosen);pool.splice(pool.indexOf(chosen),1);
+    if(!plassert)return false; // ingen lovlig plassering igjen
   }
+  return true;
 }
 
 // Variansen i alle parvise samspillstall HVIS denne inndelingen brukes.
@@ -1069,10 +1147,11 @@ function catBalanceScore(groups){
 
 // Lokalsøk: bytter spillere av samme kategori mellom lag for å jevne ut samspillet.
 // Spillere i "locked" er bundet til hverandre og røres ikke.
-function localSearch(groups,locked,iters){
+function localSearch(groups,locked,am,iters){
   if(!Object.keys(S.coOcc).length)return groups;
   if(groups.length<2)return groups;
   locked=locked||new Set();
+  am=am||new Map();
   const n=groups.flat().length;
   iters=iters||Math.min(20000,3000+n*400);
   const st=coStats(groups);
@@ -1088,6 +1167,8 @@ function localSearch(groups,locked,iters){
     const cand2=g2.filter(p=>p.cat===p1.cat&&!locked.has(p.name));
     if(!cand2.length)continue;
     const p2=cand2[Math.floor(Math.random()*cand2.length)];
+    // byttet må ikke sette to som skal unngå hverandre på samme lag
+    if(!canPlace(g2,p1,am,p2)||!canPlace(g1,p2,am,p1))continue;
     const{dS,dQ}=swapDelta(g1,g2,p1,p2);
     const nv=varianceOf(st.sum+dS,st.sumSq+dQ,st.m);
     if(nv<cur-1e-12){
@@ -1098,44 +1179,35 @@ function localSearch(groups,locked,iters){
   return groups;
 }
 
-// Pick forced pairs/splits from co-occurrence history
+// Gir lokalsøket et lite dytt: det paret som har vært minst sammen får
+// starte på samme lag. Motsatsen (tvinge de mest samspilte fra hverandre)
+// er fjernet, den gjorde i praksis ingenting og står nå i veien for
+// brukerens egne «ikke sammen»-krav.
 function getForcedConstraints(people){
-  if(!Object.keys(S.coOcc).length)return{together:[],apart:[]};
-  const names=people.map(p=>p.name);
+  if(!Object.keys(S.coOcc).length)return{together:[]};
   const pairs=[];
   for(let i=0;i<people.length;i++)for(let j=i+1;j<people.length;j++){
-    pairs.push({pa:people[i],pb:people[j],v:gco(people[i].name,people[j].name)});
+    pairs.push({pa:people[i],pb:people[j],v:pairVal(people[i],people[j],false)});
   }
-  if(!pairs.length)return{together:[],apart:[]};
-
-  // Sort by co-occurrence
-  const sorted=[...pairs].sort((a,b)=>a.v-b.v);
-
-  // Forced together: pick 1 pair from the bottom (fewest co-occurrences)
-  // Use the least-seen pair(s) — randomly pick among those tied at minimum
-  const minV=sorted[0].v;
-  const leastSeen=sorted.filter(p=>p.v===minV);
-  const togetherPair=leastSeen[Math.floor(Math.random()*leastSeen.length)];
-
-  // Forced apart: pick 1 pair from the top (most co-occurrences), only if they've been together often
-  const sortedDesc=[...pairs].sort((a,b)=>b.v-a.v);
-  const maxV=sortedDesc[0].v;
-  const mostSeen=sortedDesc.filter(p=>p.v===maxV&&p.v>0);
-  const apartPair=mostSeen.length?mostSeen[Math.floor(Math.random()*mostSeen.length)]:null;
-
-  return{
-    together:[[togetherPair.pa,togetherPair.pb]],
-    apart:apartPair?[[apartPair.pa,apartPair.pb]]:[]
-  };
+  if(!pairs.length)return{together:[]};
+  const minV=Math.min(...pairs.map(p=>p.v));
+  const minst=pairs.filter(p=>p.v<=minV+1e-12);
+  const valgt=minst[Math.floor(Math.random()*minst.length)];
+  return{together:[[valgt.pa,valgt.pb]]};
 }
 
 function buildGroups(people,numGroups,maxSize){
-  const{together,apart}=getForcedConstraints(people);
-  const g=tryGenerate(people,numGroups,maxSize,together,apart);
+  const{together}=getForcedConstraints(people);
+  const navn=new Set(people.map(p=>p.name));
+  const am=apartMap(navn);
+  // Plasseringen er grådig og kan kjøre seg fast når «ikke sammen» er i spill.
+  // Den er billig, så vi prøver noen ganger før vi gir opp.
+  let g=null;
+  for(let f=0;f<25&&!g;f++)g=tryGenerate(people,numGroups,maxSize,together,am);
   if(!g)return null;
   // Bundne spillere låses, slik at lokalsøket ikke river dem fra hverandre
-  const locked=new Set(bindingComponents(new Set(people.map(p=>p.name))).flat());
-  return localSearch(g,locked);
+  const locked=new Set(bindingComponents(navn).flat());
+  return localSearch(g,locked,am);
 }
 
 // ── Generate ──
@@ -1148,8 +1220,22 @@ function generateTeams(){
   const people=activePeople();
   const tot=people.length;if(tot<2){showToast('Minst 2 spillere må være med');return false;}
   const{numGroups,maxSize}=calcGroups(tot);
-  for(const c of bindingComponents(new Set(people.map(p=>p.name)))){
+  const navn=new Set(people.map(p=>p.name));
+  const komponenter=bindingComponents(navn);
+  for(const c of komponenter){
     if(c.length>maxSize){showToast(`${c.join(' + ')} skal spille sammen (${c.length} stk), men et lag har bare plass til ${maxSize}`);return false;}
+  }
+  for(const g of apartGroups(navn)){
+    if(g.length>numGroups){showToast(`${g.join(', ')} skal ikke spille sammen (${g.length} stk), men det er bare ${numGroups} lag`);return false;}
+  }
+  // Motstridende krav: to som både skal og ikke skal spille sammen
+  const am=apartMap(navn);
+  for(const c of komponenter){
+    for(const a of c)for(const b of c){
+      if(a!==b&&am.get(a)&&am.get(a).has(b)){
+        showToast(`${a} og ${b} er satt til både å spille sammen og ikke spille sammen`);return false;
+      }
+    }
   }
   // Run 5 independent starts, keep the one with lowest co-occurrence variance
   setPrior(tot,maxSize);
@@ -1157,12 +1243,12 @@ function generateTeams(){
   let best=null,bestScore=Infinity;
   for(let i=0;i<5;i++){
     const g=buildGroups(people,numGroups,maxSize);
-    if(!g||!bindingsSatisfied(g))continue; // aldri vis et resultat som bryter en binding
+    if(!g||!constraintsOk(g))continue; // aldri vis et resultat som bryter et krav
     const s=coVarScore(g)+catBalanceScore(g)*10000;
     if(s<bestScore){bestScore=s;best=g;}
   }
   CO=null;
-  if(!best){showToast('Kunne ikke generere lag. Sjekk bindingene.');return false;}
+  if(!best){showToast('Fikk ikke laget lag som oppfyller kravene. Prøv å fjerne en binding eller et «ikke sammen»-krav.');return false;}
   S.currentGroups=best.filter(g=>g.length).map(g=>sortGroup(g.map(p=>({name:p.name,cat:p.cat,catName:p.catName}))));
   S.shareSeed=1+Math.floor(Math.random()*1e9); // nytt stokkefrø per generering
   S.isSaved=false;
@@ -1263,7 +1349,7 @@ function moveMember(gi,pi,toGi){
 }
 // Manuelle flyttinger overstyrer bindingene, men da skal det sies fra
 function warnIfBindingBroken(){
-  if(!bindingsSatisfied(S.currentGroups))showToast('Merk: nå er en binding brutt');
+  if(!constraintsOk(S.currentGroups))showToast('Merk: nå er et av kravene brutt');
 }
 
 // ── Drag and drop ──
@@ -1424,7 +1510,7 @@ document.addEventListener('keydown',e=>{
 });
 
 // ── Init ──
-loadCats();loadArchive();loadStats();loadBindings();loadExcluded();loadShare();
+loadCats();loadArchive();loadStats();loadBindings();loadApart();loadExcluded();loadShare();
 if(S.needsOppRebuild){rebuildStatsFromArchive();delete S.needsOppRebuild;}
 pruneBindings();
 S.excluded=new Set([...S.excluded].filter(n=>allNames().includes(n)));
