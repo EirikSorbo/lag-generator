@@ -30,10 +30,6 @@
       --shadow-md:0 4px 8px rgba(15,30,60,.09),0 2px 4px rgba(15,30,60,.05);
       --shadow-lg:0 14px 32px rgba(15,30,60,.16),0 4px 12px rgba(15,30,60,.09);
       --radius:12px;--radius-sm:8px;--radius-xs:6px;
-      /* Kategorifargene holder god avstand til blåtonen og til hverandre */
-      --cat-a:#0f766e;--cat-a-bg:#e6f5f3;--cat-a-border:#9ed7d0;
-      --cat-b:#b45309;--cat-b-bg:#fdf3e7;--cat-b-border:#f3ce9c;
-      --cat-c:#7c3aed;--cat-c-bg:#f2ecfe;--cat-c-border:#d2bffa;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;padding-bottom:80px}
@@ -90,9 +86,7 @@
     .constraint-item{display:flex;align-items:center;justify-content:space-between;padding:.6rem .875rem;background:var(--surface);border-radius:var(--radius-xs);border:1px solid var(--border)}
     .constraint-badges{display:flex;flex-wrap:wrap;gap:.375rem;flex:1}
     .c-badge{padding:.2rem .55rem;border-radius:99px;font-size:.78rem;font-weight:500;border:1px solid transparent}
-    .c-badge[data-c=a]{background:var(--cat-a-bg);color:var(--cat-a);border-color:var(--cat-a-border)}
-    .c-badge[data-c=b]{background:var(--cat-b-bg);color:var(--cat-b);border-color:var(--cat-b-border)}
-    .c-badge[data-c=c]{background:var(--cat-c-bg);color:var(--cat-c);border-color:var(--cat-c-border)}
+    .c-badge[data-c]{background:var(--cc-bg,var(--surface));color:var(--cc,var(--muted));border-color:var(--cc-b,var(--border))}
     .c-sep{font-size:.72rem;color:var(--hint);align-self:center;padding:0 .1rem}
     .constraint-item.apart{border-style:dashed;border-color:var(--danger-border);background:var(--danger-bg)}
     .c-del{background:none;border:none;cursor:pointer;color:var(--muted);opacity:.45;padding:0 0 0 .625rem;font-size:1.1rem;transition:opacity .15s;flex-shrink:0}
@@ -157,14 +151,10 @@
     .member-row.is-dragging{opacity:.3;cursor:grabbing}
     .drag-handle{color:var(--hint);font-size:.75rem;line-height:1;flex-shrink:0}
     .m-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    .m-dot[data-c=a]{background:var(--cat-a)}
-    .m-dot[data-c=b]{background:var(--cat-b)}
-    .m-dot[data-c=c]{background:var(--cat-c)}
+    .m-dot[data-c]{background:var(--cc,var(--hint))}
     .group-footer{padding:.4rem 1rem;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:.4rem;flex-wrap:wrap}
     .cat-count-pill{padding:.12rem .45rem;border-radius:99px;font-size:.7rem;font-weight:500}
-    .cat-count-pill[data-c=a]{background:var(--cat-a-bg);color:var(--cat-a)}
-    .cat-count-pill[data-c=b]{background:var(--cat-b-bg);color:var(--cat-b)}
-    .cat-count-pill[data-c=c]{background:var(--cat-c-bg);color:var(--cat-c)}
+    .cat-count-pill[data-c]{background:var(--cc-bg,var(--surface));color:var(--cc,var(--muted))}
 
     /* Date modal */
     .date-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center;padding:1.25rem}
@@ -217,6 +207,7 @@
     .archive-chevron.open{transform:rotate(180deg)}
     .archive-body{display:none;padding:.875rem 1.1rem;border-top:1px solid var(--border);background:var(--surface)}
     .archive-body.open{display:block}
+    .archive-absent{font-size:.78rem;color:var(--muted);margin-bottom:.75rem;padding:.4rem .65rem;background:var(--danger-bg);border:1px dashed var(--danger-border);border-radius:var(--radius-xs)}
     .archive-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.75rem}
     .archive-group{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden}
     .archive-group-head{padding:.4rem .75rem;background:var(--primary-deep);color:#fff;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between}
@@ -239,28 +230,20 @@
     .pool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
     .pool-cat-card{border-radius:var(--radius-sm);border:1.5px solid var(--border);overflow:hidden}
     .pool-cat-head{padding:.65rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem}
-    .pool-cat-head[data-c=a]{background:var(--cat-a-bg);border-color:var(--cat-a-border)}
-    .pool-cat-head[data-c=b]{background:var(--cat-b-bg);border-color:var(--cat-b-border)}
-    .pool-cat-head[data-c=c]{background:var(--cat-c-bg);border-color:var(--cat-c-border)}
+    .pool-cat-head[data-c]{background:var(--cc-bg,var(--surface));border-color:var(--cc-b,var(--border))}
     .pool-cat-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-    .pool-cat-dot[data-c=a]{background:var(--cat-a)}
-    .pool-cat-dot[data-c=b]{background:var(--cat-b)}
-    .pool-cat-dot[data-c=c]{background:var(--cat-c)}
-    .pool-cat-name-input{flex:1;font-family:inherit;font-size:.875rem;font-weight:600;background:transparent;border:none;outline:none}
-    .pool-cat-name-input[data-c=a]{color:var(--cat-a)}
-    .pool-cat-name-input[data-c=b]{color:var(--cat-b)}
-    .pool-cat-name-input[data-c=c]{color:var(--cat-c)}
+    .pool-cat-dot[data-c]{background:var(--cc,var(--hint))}
+    .pool-cat-name-input{flex:1;min-width:0;font-family:inherit;font-size:.875rem;font-weight:600;background:transparent;border:none;outline:none}
+    .pool-cat-name-input[data-c]{color:var(--cc,var(--text))}
     .pool-cat-body{padding:.75rem 1rem;background:var(--card)}
     .pool-input-row{display:flex;gap:.4rem;margin-bottom:.6rem}
-    .pool-name-input{flex:1;padding:.45rem .65rem;font-family:inherit;font-size:.82rem;border:1px solid var(--border);border-radius:var(--radius-xs);outline:none;background:var(--surface);color:var(--text)}
+    .pool-name-input{flex:1;min-width:0;padding:.45rem .65rem;font-family:inherit;font-size:.82rem;border:1px solid var(--border);border-radius:var(--radius-xs);outline:none;background:var(--surface);color:var(--text)}
     .pool-name-input:focus{border-color:var(--border-strong);background:#fff}
-    .pool-add-btn{padding:.45rem .75rem;font-family:inherit;font-size:.82rem;font-weight:500;border:1px solid var(--border-strong);border-radius:var(--radius-xs);background:#fff;color:var(--text);cursor:pointer;white-space:nowrap}
+    .pool-add-btn{flex-shrink:0;padding:.45rem .75rem;font-family:inherit;font-size:.82rem;font-weight:500;border:1px solid var(--border-strong);border-radius:var(--radius-xs);background:#fff;color:var(--text);cursor:pointer;white-space:nowrap}
     .pool-add-btn:hover{background:var(--surface)}
     .pool-names-list{display:flex;flex-direction:column;gap:.3rem;max-height:200px;overflow-y:auto}
     .pool-name-row{display:flex;align-items:center;justify-content:space-between;padding:.3rem .55rem;border-radius:4px;font-size:.82rem}
-    .pool-name-row[data-c=a]{background:var(--cat-a-bg);color:var(--cat-a)}
-    .pool-name-row[data-c=b]{background:var(--cat-b-bg);color:var(--cat-b)}
-    .pool-name-row[data-c=c]{background:var(--cat-c-bg);color:var(--cat-c)}
+    .pool-name-row[data-c]{background:var(--cc-bg,var(--surface));color:var(--cc,var(--text))}
     .pool-name-del{background:none;border:none;cursor:pointer;opacity:.4;color:inherit;font-size:.95rem;line-height:1;padding:0;transition:opacity .15s}
     .pool-name-del:hover{opacity:1}
     .pool-cat-count{font-size:.72rem;color:var(--hint);margin-top:.4rem}
@@ -279,17 +262,11 @@
     .bind-modal-body{padding:1.25rem 1.5rem;overflow-y:auto;flex:1}
     .modal-cat-section{margin-bottom:1.25rem}
     .modal-cat-title{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;margin-bottom:.5rem}
-    .modal-cat-title[data-c=a]{color:var(--cat-a)}
-    .modal-cat-title[data-c=b]{color:var(--cat-b)}
-    .modal-cat-title[data-c=c]{color:var(--cat-c)}
+    .modal-cat-title[data-c]{color:var(--cc,var(--muted))}
     .modal-names{display:flex;flex-wrap:wrap;gap:.45rem}
     .m-name-btn{padding:.35rem .75rem;font-family:inherit;font-size:.82rem;font-weight:500;border-radius:99px;cursor:pointer;transition:all .15s;border:1.5px solid transparent}
-    .m-name-btn[data-c=a]{background:var(--cat-a-bg);color:var(--cat-a);border-color:var(--cat-a-border)}
-    .m-name-btn[data-c=b]{background:var(--cat-b-bg);color:var(--cat-b);border-color:var(--cat-b-border)}
-    .m-name-btn[data-c=c]{background:var(--cat-c-bg);color:var(--cat-c);border-color:var(--cat-c-border)}
-    .m-name-btn.sel[data-c=a]{background:var(--cat-a);color:#fff}
-    .m-name-btn.sel[data-c=b]{background:var(--cat-b);color:#fff}
-    .m-name-btn.sel[data-c=c]{background:var(--cat-c);color:#fff}
+    .m-name-btn.sel[data-c]{background:var(--cc);color:#fff;border-color:var(--cc)}
+    .m-name-btn[data-c]{background:var(--cc-bg,var(--surface));color:var(--cc,var(--text));border-color:var(--cc-b,var(--border))}
     .modal-sel-label{font-size:.78rem;color:var(--hint);margin-bottom:1rem}
     .bind-modal-foot{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.75rem;justify-content:flex-end}
     .btn-cancel{padding:.5rem 1rem;font-family:inherit;font-size:.875rem;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);background:transparent;color:var(--muted);cursor:pointer}
@@ -337,12 +314,19 @@
 
     /* Kategoribytte i troppen */
     .pool-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+    /* Navnet er et redigerbart felt som ser ut som tekst til man klikker */
+    .pool-name-edit{flex:1;min-width:0;font-family:inherit;font-size:.82rem;font-weight:500;color:inherit;background:transparent;border:1px solid transparent;border-radius:4px;padding:.1rem .25rem;outline:none}
+    .pool-name-edit:hover{border-color:rgba(0,0,0,.12)}
+    .pool-name-edit:focus{background:var(--card);border-color:var(--primary)}
+    .pool-add-cat{display:flex;align-items:center;justify-content:center;gap:.4rem;min-height:120px;font-family:inherit;font-size:.875rem;font-weight:500;border:1.5px dashed var(--border-strong);border-radius:var(--radius-sm);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
+    .pool-add-cat:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
     .pool-row-right{display:flex;align-items:center;gap:.45rem;flex-shrink:0}
     .pool-row-btn{background:none;border:none;cursor:pointer;color:inherit;opacity:.45;padding:0;line-height:1;transition:opacity .15s}
     .pool-row-btn:hover{opacity:1}
     .pool-row-btn svg{display:block}
 
   </style>
+  <style id="catColors"></style>
   <script>
   // Offline-støtte. Kjører ikke når fila åpnes direkte fra disk.
   if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
@@ -363,7 +347,7 @@
       <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this)">
     </div>
     <div class="header-center"><h1>Gruppegenerator</h1></div>
-    <div class="header-right"><span class="version">v1.22</span></div>
+    <div class="header-right"><span class="version">v1.23</span></div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('main',this)">Generer</button>
@@ -553,6 +537,26 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ── Kategorifarger ──
+// Fargene bor her, ikke i CSS-en, slik at antall kategorier kan endres.
+// Hver kategori får en [data-c="…"]-regel som setter --cc-variablene, og alle
+// CSS-reglene leser dem. Rekkefølgen bestemmer hvilken farge kategori nr. n får.
+const CAT_PALETTE=[
+  {c:'#0f766e',bg:'#e6f5f3',b:'#9ed7d0'}, // turkis
+  {c:'#b45309',bg:'#fdf3e7',b:'#f3ce9c'}, // rav
+  {c:'#7c3aed',bg:'#f2ecfe',b:'#d2bffa'}, // fiolett
+  {c:'#be123c',bg:'#fdf0f3',b:'#f6bfcd'}, // rosa
+  {c:'#4d7c0f',bg:'#f1f8e8',b:'#c4dfa2'}, // oliven
+  {c:'#a21caf',bg:'#fbecfb',b:'#eebdec'}  // magenta
+];
+const MAX_CATS=CAT_PALETTE.length;
+function applyCatColors(){
+  document.getElementById('catColors').textContent=S.cats.map((cat,i)=>{
+    const p=CAT_PALETTE[i%CAT_PALETTE.length];
+    return `[data-c="${cat.id}"]{--cc:${p.c};--cc-bg:${p.bg};--cc-b:${p.b}}`;
+  }).join('\n');
+}
+
 // ── State ──
 const S = {
   cats:[
@@ -593,7 +597,15 @@ function warnStorage(){
 function todayISO(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 
 function saveCats(){try{localStorage.setItem('gf_cats',JSON.stringify(S.cats.map(c=>({id:c.id,name:c.name,names:c.names}))));}catch(e){warnStorage();}}
-function loadCats(){try{const d=localStorage.getItem('gf_cats');if(d){const s=JSON.parse(d);if(Array.isArray(s))for(const x of s){const c=x&&S.cats.find(c=>c.id===x.id);if(c){if(typeof x.name==='string')c.name=x.name;if(Array.isArray(x.names))c.names=x.names.filter(n=>typeof n==='string');}}}}catch(e){}}
+function loadCats(){
+  try{
+    const d=localStorage.getItem('gf_cats');if(!d)return;
+    const s=JSON.parse(d);if(!Array.isArray(s)||!s.length)return;
+    const rene=s.filter(x=>x&&typeof x.id==='string'&&Array.isArray(x.names)).slice(0,MAX_CATS)
+      .map(x=>({id:x.id,name:typeof x.name==='string'?x.name:'Kategori',names:x.names.filter(n=>typeof n==='string')}));
+    if(rene.length)S.cats=rene;
+  }catch(e){}
+}
 function saveStats(){try{localStorage.setItem('gf_co',JSON.stringify(S.coOcc));localStorage.setItem('gf_opp',JSON.stringify(S.opp));localStorage.setItem('gf_gc',String(S.genCount));}catch(e){warnStorage();}}
 function loadStats(){
   try{
@@ -682,8 +694,9 @@ function importData(input){
     if(!d||typeof d!=='object'||!Array.isArray(d.cats)){showToast('Ugyldig fil');return;}
     // Valider før vi rører eksisterende data
     const seen=new Set();
+    if(!d.cats.length||d.cats.length>MAX_CATS){showToast(`Ugyldig fil: må ha mellom 1 og ${MAX_CATS} kategorier`);return;}
     for(const x of d.cats){
-      if(!x||!S.cats.some(c=>c.id===x.id)||!Array.isArray(x.names)){showToast('Ugyldig fil: kategoriene stemmer ikke');return;}
+      if(!x||typeof x.id!=='string'||!Array.isArray(x.names)){showToast('Ugyldig fil: kategoriene stemmer ikke');return;}
       for(const n of x.names){
         if(typeof n!=='string'){showToast('Ugyldig fil: et navn er ikke tekst');return;}
         if(seen.has(n)){showToast(`Ugyldig fil: "${n}" står i to kategorier`);return;}
@@ -691,7 +704,8 @@ function importData(input){
       }
     }
     if(!confirm('Erstatte all eksisterende data med importert data?'))return;
-    for(const x of d.cats){const c=S.cats.find(c=>c.id===x.id);if(c){if(typeof x.name==='string')c.name=x.name;c.names=x.names.slice();}}
+    S.cats=d.cats.map(x=>({id:x.id,name:typeof x.name==='string'?x.name:'Kategori',names:x.names.slice()}));
+    applyCatColors();
     S.coOcc=(d.coOcc&&typeof d.coOcc==='object')?d.coOcc:{};
     S.opp=(d.opp&&typeof d.opp==='object')?d.opp:{};
     S.genCount=parseInt(d.genCount)||0;
@@ -717,6 +731,8 @@ function gco(a,b){return S.coOcc[ck(a,b)]||0;}
 // møter annenhver gang se ut som om hen «skylder» samspill med alle.
 // Eldre data uten oppmøtetall faller tilbake på «alle var med hver gang».
 function gopp(a,b){const v=S.opp[ck(a,b)];return v===undefined?S.genCount:v;}
+// Har vi noe å bygge på i det hele tatt?
+function harHistorikk(){return S.archive.length>0||Object.keys(S.coOcc).length>0;}
 function recordGen(groups,matchDate){
   const gs=groups.filter(g=>g.length); // tomme lag skal ikke arkiveres
   const tilstede=gs.flat();
@@ -724,10 +740,13 @@ function recordGen(groups,matchDate){
   for(const g of gs)for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){const k=ck(g[i].name,g[j].name);S.coOcc[k]=(S.coOcc[k]||0)+1;}
   S.genCount++;
   // Archive entry
+  const med=new Set(tilstede.map(p=>p.name));
   const entry={
     id:Date.now(),
     matchDate:matchDate||todayISO(),
     regDate:todayISO(),
+    // hvem som satt over: ellers kan man ikke etterprøve en gammel økt
+    excluded:allNames().filter(n=>!med.has(n)),
     groups:gs.map(g=>g.map(p=>({name:p.name,cat:p.cat})))
   };
   S.archive.unshift(entry);
@@ -744,7 +763,27 @@ function activePlayers(){return S.cats.flatMap(c=>c.names.filter(n=>!S.excluded.
 function trunc(s,n){return s.length>n?s.slice(0,n-1)+'…':s;}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function fmtDate(iso){if(!iso)return'';try{const[y,m,d]=iso.split('-');return`${d}.${m}.${y}`;}catch(e){return iso;}}
-function catOrder(cat){return cat==='a'?0:cat==='b'?1:2;}
+function catOrder(cat){const i=S.cats.findIndex(c=>c.id===cat);return i<0?99:i;}
+// Neste ledige kategori-id: a, b, c, …
+function nextCatId(){
+  const brukt=new Set(S.cats.map(c=>c.id));
+  for(let i=0;i<26;i++){const id=String.fromCharCode(97+i);if(!brukt.has(id))return id;}
+  return null;
+}
+function addCat(){
+  if(S.cats.length>=MAX_CATS){showToast(`Det er plass til ${MAX_CATS} kategorier`);return;}
+  const id=nextCatId();if(!id)return;
+  S.cats.push({id,name:`Kategori ${id.toUpperCase()}`,names:[]});
+  saveCats();applyCatColors();renderPoolGrid();
+}
+function removeCat(id){
+  const cat=S.cats.find(c=>c.id===id);if(!cat)return;
+  if(S.cats.length<=1){showToast('Du må ha minst én kategori');return;}
+  if(cat.names.length){showToast(`Flytt eller slett de ${cat.names.length} spillerne først`);return;}
+  if(!confirm(`Slette kategorien "${cat.name}"?`))return;
+  S.cats=S.cats.filter(c=>c.id!==id);
+  saveCats();applyCatColors();renderPoolGrid();
+}
 
 // ── Player pills (alphabetical, no categories) ──
 function renderPlayerPills(){
@@ -841,6 +880,9 @@ function renderPoolGrid(){
       <div class="pool-cat-head" data-c="${cat.id}">
         <div class="pool-cat-dot" data-c="${cat.id}"></div>
         <input class="pool-cat-name-input" data-c="${cat.id}" value="${h(cat.name)}" oninput="renameCat('${cat.id}',this.value)">
+        <button class="pool-row-btn" title="Slett kategorien" onclick="removeCat('${cat.id}')">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.2a1 1 0 0 0 1 .8h3.8a1 1 0 0 0 1-.8l.6-8.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
       <div class="pool-cat-body">
         <div class="pool-input-row">
@@ -850,12 +892,14 @@ function renderPoolGrid(){
         <div class="pool-names-list" id="pnl_${cat.id}">${renderPoolNameList(cat)}</div>
         <div class="pool-cat-count" id="pnc_${cat.id}" ${!cat.names.length?'style="display:none"':''}>${cat.names.length} spillere</div>
       </div>
-    </div>`).join('');
+    </div>`).join('')+
+    (S.cats.length<MAX_CATS?`<button class="pool-add-cat" onclick="addCat()"><span style="font-size:1.2rem;line-height:1">+</span> Ny kategori</button>`:'');
   updatePoolTotal();
 }
 function renderPoolNameList(cat){
   return cat.names.map((n,i)=>`<div class="pool-name-row" data-c="${cat.id}">
-    <span class="pool-name-text" title="${h(n)}">${h(n)}</span>
+    <input class="pool-name-edit" value="${h(n)}" title="Trykk for å endre navn"
+      onchange="renamePlayer('${cat.id}',${i},this)" onkeydown="if(event.key==='Enter')this.blur()">
     <div class="pool-row-right">
       <button class="pool-row-btn" title="Bytt kategori" onclick="openCatMenu(event,'${cat.id}',${i})">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2.5 5.5h9m0 0L9 3m2.5 2.5L9 8M13.5 10.5h-9m0 0L7 8m-2.5 2.5L7 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -871,6 +915,43 @@ function openCatMenu(e,catId,idx){
   showMenuAt(e.currentTarget,`<div class="move-menu-title">Flytt ${h(name)} til</div>`+
     S.cats.filter(c=>c.id!==catId).map(c=>`<button onclick="movePlayerCat('${catId}',${idx},'${c.id}')">${h(c.name)}<span>${c.names.length} spillere</span></button>`).join(''));
 }
+// Navnet er spillerens identitet: det står i statistikknøklene, i arkivet, i
+// bindingene og i utelatelsene. Et navnebytte må derfor flyttes overalt samtidig.
+function renamePlayer(catId,idx,input){
+  const cat=S.cats.find(c=>c.id===catId);if(!cat)return;
+  const gammelt=cat.names[idx];if(gammelt===undefined)return;
+  const nytt=String(input.value).trim();
+  const angre=()=>{input.value=gammelt;};
+  if(!nytt||nytt===gammelt)return angre();
+  if(nytt.includes('|')){showToast('Navnet kan ikke inneholde tegnet |');return angre();}
+  if(allNames().includes(nytt)){showToast(`"${nytt}" finnes allerede`);return angre();}
+
+  cat.names[idx]=nytt;
+  const bytt=n=>n===gammelt?nytt:n;
+  // statistikknøklene er bygget av navnene
+  const flyttNøkler=obj=>{
+    const ut={};
+    for(const [k,v] of Object.entries(obj)){
+      const [a,b]=k.split('|');
+      const nk=ck(bytt(a),bytt(b));
+      ut[nk]=(ut[nk]||0)+v;
+    }
+    return ut;
+  };
+  S.coOcc=flyttNøkler(S.coOcc);
+  S.opp=flyttNøkler(S.opp);
+  for(const e of S.archive)for(const g of e.groups||[])for(const p of g)if(p.name===gammelt)p.name=nytt;
+  for(const e of S.archive)if(Array.isArray(e.excluded))e.excluded=e.excluded.map(bytt);
+  S.bindings=S.bindings.map(b=>b.map(bytt));
+  S.apart=S.apart.map(b=>b.map(bytt));
+  if(S.excluded.delete(gammelt))S.excluded.add(nytt);
+  for(const g of S.currentGroups)for(const p of g)if(p.name===gammelt)p.name=nytt;
+
+  saveCats();saveStats();saveArchive();saveBindings();saveApart();saveExcluded();
+  refreshPoolCat(catId);
+  showToast(`${gammelt} heter nå ${nytt}`,'ok');
+}
+
 // Bytter kategori uten å røre navnet, så all samspillshistorikk følger med
 function movePlayerCat(fromId,idx,toId){
   closeMoveMenu();
@@ -892,6 +973,7 @@ function updatePoolTotal(){document.getElementById('poolTotal').innerHTML=`<stro
 function renameCat(id,val){S.cats.find(c=>c.id===id).name=val;saveCats();}
 function addPoolName(catId){
   const inp=document.getElementById(`pni_${catId}`);const name=inp.value.trim();if(!name)return;
+  if(name.includes('|')){showToast('Navnet kan ikke inneholde tegnet |');return;}
   if(allNames().includes(name)){showToast(`"${name}" finnes allerede`);return;}
   S.cats.find(c=>c.id===catId).names.push(name);inp.value='';saveCats();refreshPoolCat(catId);
   document.getElementById(`pni_${catId}`)?.focus();
@@ -1082,15 +1164,44 @@ function distributeBalanced(groups,rem,maxSize,am){
 // uten å regne ut hele scoren på nytt (se swapDelta).
 // Samspillstallene slås opp titusenvis av ganger per generering. Vi legger dem
 // derfor i en tabell med tallindeks, i stedet for å bygge en strengnøkkel hver gang.
+// Gamle økter skal ikke telle like tungt som ferske. Vekten halveres for hver
+// HALVERING økter bakover i tid, så en kamp for et år siden påvirker lite, mens
+// forrige uke påvirker mye. Statistikkfanen viser fortsatt de rå tallene.
+const HALVERING=20;
 let CO=null;
 function buildCoMatrix(people){
   const n=people.length;
   people.forEach((p,i)=>{p._i=i;});
   const m=new Float64Array(n*n),o=new Float64Array(n*n);
-  for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
-    const v=gco(people[i].name,people[j].name),w=gopp(people[i].name,people[j].name);
-    m[i*n+j]=v;m[j*n+i]=v;
-    o[i*n+j]=w;o[j*n+i]=w;
+  if(S.archive.length){
+    const idx=new Map(people.map((p,i)=>[p.name,i]));
+    // nyeste kampdato først, uavhengig av når økta ble registrert
+    const etterDato=S.archive.map((e,i)=>({e,i}))
+      .sort((x,y)=>String(y.e.matchDate||'').localeCompare(String(x.e.matchDate||''))||x.i-y.i);
+    etterDato.forEach(({e},rang)=>{
+      if(!e||!Array.isArray(e.groups))return;
+      const w=Math.pow(.5,rang/HALVERING);
+      const tilstede=e.groups.filter(Array.isArray).flat().filter(p=>idx.has(p.name));
+      for(let i=0;i<tilstede.length;i++)for(let j=i+1;j<tilstede.length;j++){
+        const a=idx.get(tilstede[i].name),b=idx.get(tilstede[j].name);
+        o[a*n+b]+=w;o[b*n+a]+=w;
+      }
+      for(const g of e.groups){
+        if(!Array.isArray(g))continue;
+        const med=g.filter(p=>idx.has(p.name));
+        for(let i=0;i<med.length;i++)for(let j=i+1;j<med.length;j++){
+          const a=idx.get(med[i].name),b=idx.get(med[j].name);
+          m[a*n+b]+=w;m[b*n+a]+=w;
+        }
+      }
+    });
+  }else{
+    // Eldre data uten arkiv: bruk de flate tallene, uten aldring
+    for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
+      const v=gco(people[i].name,people[j].name),w=gopp(people[i].name,people[j].name);
+      m[i*n+j]=v;m[j*n+i]=v;
+      o[i*n+j]=w;o[j*n+i]=w;
+    }
   }
   CO={n,m,o};
 }
@@ -1148,7 +1259,7 @@ function catBalanceScore(groups){
 // Lokalsøk: bytter spillere av samme kategori mellom lag for å jevne ut samspillet.
 // Spillere i "locked" er bundet til hverandre og røres ikke.
 function localSearch(groups,locked,am,iters){
-  if(!Object.keys(S.coOcc).length)return groups;
+  if(!harHistorikk())return groups;
   if(groups.length<2)return groups;
   locked=locked||new Set();
   am=am||new Map();
@@ -1184,7 +1295,7 @@ function localSearch(groups,locked,am,iters){
 // er fjernet, den gjorde i praksis ingenting og står nå i veien for
 // brukerens egne «ikke sammen»-krav.
 function getForcedConstraints(people){
-  if(!Object.keys(S.coOcc).length)return{together:[]};
+  if(!harHistorikk())return{together:[]};
   const pairs=[];
   for(let i=0;i<people.length;i++)for(let j=i+1;j<people.length;j++){
     pairs.push({pa:people[i],pb:people[j],v:pairVal(people[i],people[j],false)});
@@ -1280,7 +1391,7 @@ function renderGroupsModal(){
   document.getElementById('modalDateLabel').textContent=fmtDate(S.currentMatchDate);
   updateSaveBtn();
   document.getElementById('groupsGrid').innerHTML=S.currentGroups.map((g,gi)=>{
-    const cc={a:0,b:0,c:0};for(const p of g)cc[p.cat]=(cc[p.cat]||0)+1;
+    const cc={};for(const p of g)cc[p.cat]=(cc[p.cat]||0)+1;
     return`<div class="group-card" id="gc_${gi}" ondragover="onDragOver(event,${gi})" ondragleave="onDragLeave(event,${gi})" ondrop="onDrop(event,${gi})">
       <div class="group-head">
         <div class="group-head-title">Lag ${gi+1}</div>
@@ -1441,7 +1552,7 @@ function renderStats(){
     const cls=hi&&p.sammen>0?'hi':(!hi&&p.sammen===0?'lo':'');
     return`<div class="pair-item"><span class="c-badge" data-c="${p.n1.cat}">${h(trunc(p.n1.name,14))}</span><span style="color:var(--hint);font-size:.7rem">og</span><span class="c-badge" data-c="${p.n2.cat}">${h(trunc(p.n2.name,14))}</span><span class="pair-count ${cls}" title="${pst(p.andel)} av øktene begge var med i">${p.sammen} av ${p.felles}</span></div>`;
   }
-  const pairsHtml=`<div class="stats-note">Tallet viser hvor mange ganger paret har vært på samme lag, av de øktene begge var med i.</div>
+  const pairsHtml=`<div class="stats-note">Tallet viser hvor mange ganger paret har vært på samme lag, av de øktene begge var med i. Når nye lag settes opp veier ferske økter tyngre enn gamle.</div>
   <div class="pairs-grid">
     <div class="pairs-col"><div class="pairs-col-title" style="color:var(--danger)">Mest på samme lag</div>${most.map(p=>pRow(p,true)).join('')}</div>
     <div class="pairs-col"><div class="pairs-col-title" style="color:var(--primary)">Sjeldnest på samme lag</div>${least.map(p=>pRow(p,false)).join('')}</div>
@@ -1468,6 +1579,7 @@ function renderArchive(){
         </div>
       </div>
       <div class="archive-body" id="abody_${ei}">
+        ${Array.isArray(entry.excluded)&&entry.excluded.length?`<div class="archive-absent">Satt over: ${entry.excluded.map(n=>h(n)).join(', ')}</div>`:''}
         <div class="archive-groups">${entry.groups.map((g,gi)=>`
           <div class="archive-group">
             <div class="archive-group-head"><span>Lag ${gi+1}</span><span>${g.length}</span></div>
@@ -1512,6 +1624,7 @@ document.addEventListener('keydown',e=>{
 // ── Init ──
 loadCats();loadArchive();loadStats();loadBindings();loadApart();loadExcluded();loadShare();
 if(S.needsOppRebuild){rebuildStatsFromArchive();delete S.needsOppRebuild;}
+applyCatColors();
 pruneBindings();
 S.excluded=new Set([...S.excluded].filter(n=>allNames().includes(n)));
 applyShareMode();
