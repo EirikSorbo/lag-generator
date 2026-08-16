@@ -42,9 +42,10 @@
     .header-right{flex:1;display:flex;justify-content:flex-end;align-items:center}
     .version{font-size:.68rem;opacity:.6;font-weight:400;letter-spacing:.03em}
     .header-center h1{font-size:1.6rem;font-weight:600;letter-spacing:-.4px}
-    .io-btn-sm{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.78);padding:2px;transition:color .15s;line-height:1}
-    .io-btn-sm:hover{color:#fff}
-    .io-btn-sm svg{display:block}
+    /* Dempet flate, ellers forveksles raden med en arkivoppføring */
+    .backup-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:var(--surface);border:1px dashed var(--border-strong);border-radius:var(--radius);padding:.875rem 1.1rem;margin-bottom:1.25rem}
+    .backup-title{font-size:.875rem;font-weight:600;color:var(--muted)}
+    .backup-sub{font-size:.78rem;color:var(--hint);margin-top:.1rem}
 
     /* Tabs */
     .tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.25);margin-top:.25rem}
@@ -337,17 +338,10 @@
 <body>
 <div class="header">
   <div class="header-top">
-    <div class="header-left">
-      <button class="io-btn-sm" onclick="exportData()" title="Eksporter data">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v9M5 7l3 3 3-3M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="io-btn-sm" onclick="document.getElementById('importInput').click()" title="Importer data">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 15V6M5 9l3-3 3 3M2 3h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this)">
-    </div>
+    <!-- tom, men holder tittelen midtstilt mot versjonsnummeret til høyre -->
+    <div class="header-left"></div>
     <div class="header-center"><h1>Gruppegenerator</h1></div>
-    <div class="header-right"><span class="version">v1.24</span></div>
+    <div class="header-right"><span class="version">v1.25</span></div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('main',this)">Generer</button>
@@ -449,6 +443,23 @@
           Delevisning
         </button>
         <button class="btn-reset" onclick="deleteAllArchive()">Slett hele arkivet</button>
+      </div>
+    </div>
+    <div class="backup-bar">
+      <div class="backup-text">
+        <div class="backup-title">Sikkerhetskopi</div>
+        <div class="backup-sub">Alt ligger bare på denne enheten: tropp, statistikk og arkiv</div>
+      </div>
+      <div class="head-actions">
+        <button class="btn-soft" onclick="exportData()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1v9M5 7l3 3 3-3M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Eksporter
+        </button>
+        <button class="btn-soft" onclick="document.getElementById('importInput').click()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 15V6M5 9l3-3 3 3M2 3h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Importer
+        </button>
+        <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this)">
       </div>
     </div>
     <div id="archiveContent"></div>
