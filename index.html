@@ -36,15 +36,12 @@
 
     /* Header */
     .header{background:var(--primary-deep);color:#fff;padding:1.5rem 1.5rem 0;position:relative}
-    .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;gap:.5rem}
-    .header-left{display:flex;gap:.35rem;align-items:center;flex:1}
-    .header-center{flex:1;text-align:center}
-    .header-right{flex:1;display:flex;justify-content:flex-end;align-items:center}
-    .version{font-size:.68rem;opacity:.6;font-weight:400;letter-spacing:.03em}
-    .header-center h1{font-size:1.6rem;font-weight:600;letter-spacing:-.4px}
+    .header-top{display:flex;align-items:center;justify-content:center;margin-bottom:.75rem}
+    .header-top h1{font-size:1.6rem;font-weight:600;letter-spacing:-.4px}
     /* Dempet flate, ellers forveksles raden med en arkivoppføring */
     .backup-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:var(--surface);border:1px dashed var(--border-strong);border-radius:var(--radius);padding:.875rem 1.1rem;margin-bottom:1.25rem}
     .backup-title{font-size:.875rem;font-weight:600;color:var(--muted)}
+    .app-footer{text-align:center;font-size:.75rem;color:var(--hint);letter-spacing:.03em;padding:2rem 0 .5rem}
     .backup-sub{font-size:.78rem;color:var(--hint);margin-top:.1rem}
 
     /* Tabs */
@@ -338,10 +335,7 @@
 <body>
 <div class="header">
   <div class="header-top">
-    <!-- tom, men holder tittelen midtstilt mot versjonsnummeret til høyre -->
-    <div class="header-left"></div>
-    <div class="header-center"><h1>Gruppegenerator</h1></div>
-    <div class="header-right"><span class="version">v1.25</span></div>
+    <h1>Gruppegenerator</h1>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('main',this)">Generer</button>
@@ -463,6 +457,7 @@
       </div>
     </div>
     <div id="archiveContent"></div>
+    <div class="app-footer">Gruppegenerator <span class="version">v1.26</span></div>
   </div>
 </div>
 
