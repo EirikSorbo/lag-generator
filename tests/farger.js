@@ -1,0 +1,20 @@
+const {S,CAT_PALETTE,addCat,removeCat,MAX_CATS,nextCatColor}=require('./app.js');
+global.confirm=()=>true;
+let funn=0;
+const t=(n,ok,d='')=>{console.log(`${ok?'  ok  ':' FUNN '} ${n}${d?'  '+d:''}`);if(!ok)funn++;};
+const farge=id=>{const c=S.cats.find(x=>x.id===id);return c?CAT_PALETTE[c.color].c:null;};
+S.cats=[{id:'a',name:'A',names:[],color:0},{id:'b',name:'B',names:[],color:1},{id:'c',name:'C',names:[],color:2}];
+const cFør=farge('c');
+removeCat('b');
+t('C beholder fargen når B slettes',farge('c')===cFør,`${cFør} -> ${farge('c')}`);
+addCat();
+t('Ny kategori tar den ledige fargen (b sin)',S.cats.find(x=>x.id==='b').color===1,`color=${S.cats.find(x=>x.id==='b').color}`);
+t('Ingen to kategorier deler farge',new Set(S.cats.map(c=>c.color)).size===S.cats.length,S.cats.map(c=>c.id+':'+c.color).join(' '));
+while(S.cats.length<MAX_CATS)addCat();
+t(`Alle ${MAX_CATS} kategoriene får hver sin farge`,new Set(S.cats.map(c=>c.color)).size===MAX_CATS,S.cats.map(c=>c.id+':'+c.color).join(' '));
+// slett to i midten og legg til igjen
+S.cats.find(x=>x.id==='c').names=[];S.cats.find(x=>x.id==='e').names=[];
+const dFør=farge('d'),fFør=farge('f');
+removeCat('c');removeCat('e');
+t('D og F beholder fargene når C og E slettes',farge('d')===dFør&&farge('f')===fFør);
+console.log(funn?`\n${funn} funn`:'\ningen funn');

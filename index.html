@@ -457,13 +457,13 @@
       </div>
     </div>
     <div id="archiveContent"></div>
-    <div class="app-footer">Gruppegenerator <span class="version">v1.26</span></div>
+    <div class="app-footer">Gruppegenerator <span class="version">v1.27</span></div>
   </div>
 </div>
 
 <!-- Date modal -->
 <div class="date-modal-backdrop" id="dateModal">
-  <div class="date-modal-box">
+  <div class="date-modal-box" role="dialog" aria-modal="true" aria-label="Kampens dato">
     <h2>Kampens dato</h2>
     <div class="date-field">
       <label for="matchDateInput">Dato</label>
@@ -478,7 +478,7 @@
 
 <!-- Results modal -->
 <div class="modal-backdrop" id="resultsModal">
-  <div class="modal-box">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-label="Genererte lag">
     <div class="modal-head">
       <div class="modal-head-left">
         <div class="modal-head-title" id="modalTitle">Lag</div>
@@ -496,7 +496,7 @@
         </button>
         <button class="btn-modal-regen" onclick="reGenerate()" title="Generer nytt lag">↻<span class="lbl"> Generer nytt lag</span></button>
         <button class="btn-modal-save" id="btnSave" onclick="saveToStats()">Lagre i statistikk</button>
-        <button class="btn-modal-close" onclick="closeResultsModal()">×</button>
+        <button class="btn-modal-close" aria-label="Lukk lagvisningen" onclick="closeResultsModal()">×</button>
       </div>
     </div>
     <div class="modal-body">
@@ -508,10 +508,10 @@
 
 <!-- Pool modal -->
 <div class="modal-backdrop-pool" id="poolModal" onclick="handlePoolBackdrop(event)">
-  <div class="pool-modal-box">
+  <div class="pool-modal-box" role="dialog" aria-modal="true" aria-label="Endre tropp">
     <div class="pool-modal-head">
       <h2>Endre Tropp</h2>
-      <button class="modal-close" onclick="closePoolModal()">×</button>
+      <button class="modal-close" aria-label="Lukk troppen" onclick="closePoolModal()">×</button>
     </div>
     <div class="pool-modal-body"><div class="pool-grid" id="poolGrid"></div></div>
     <div class="pool-modal-foot">
@@ -523,10 +523,10 @@
 
 <!-- Bind modal -->
 <div class="bind-modal-backdrop" id="bindModal" onclick="handleBindBackdrop(event)">
-  <div class="bind-modal-box">
+  <div class="bind-modal-box" role="dialog" aria-modal="true" aria-label="Legg til krav">
     <div class="bind-modal-head">
       <h2 id="bindModalTitle">Skal spille sammen</h2>
-      <button class="modal-close" onclick="closeBindModal()">×</button>
+      <button class="modal-close" aria-label="Lukk" onclick="closeBindModal()">×</button>
     </div>
     <div class="bind-modal-body">
       <p class="modal-sel-label" id="selLabel">0 valgt</p>
@@ -556,9 +556,16 @@ const CAT_PALETTE=[
   {c:'#a21caf',bg:'#fbecfb',b:'#eebdec'}  // magenta
 ];
 const MAX_CATS=CAT_PALETTE.length;
+// Fargen henger på kategorien, ikke på plasseringen i lista. Ellers ville
+// sletting av én kategori endre fargen på alle etter den, også bakover i arkivet.
+function nextCatColor(){
+  const brukt=new Set(S.cats.map(c=>c.color));
+  for(let i=0;i<CAT_PALETTE.length;i++)if(!brukt.has(i))return i;
+  return 0;
+}
 function applyCatColors(){
   document.getElementById('catColors').textContent=S.cats.map((cat,i)=>{
-    const p=CAT_PALETTE[i%CAT_PALETTE.length];
+    const p=CAT_PALETTE[(cat.color!==undefined?cat.color:i)%CAT_PALETTE.length];
     return `[data-c="${cat.id}"]{--cc:${p.c};--cc-bg:${p.bg};--cc-b:${p.b}}`;
   }).join('\n');
 }
@@ -566,9 +573,9 @@ function applyCatColors(){
 // ── State ──
 const S = {
   cats:[
-    {id:'a',name:'Kategori A',names:[]},
-    {id:'b',name:'Kategori B',names:[]},
-    {id:'c',name:'Kategori C',names:[]}
+    {id:'a',name:'Kategori A',names:[],color:0},
+    {id:'b',name:'Kategori B',names:[],color:1},
+    {id:'c',name:'Kategori C',names:[],color:2}
   ],
   mode:'count', num:4, bindings:[], apart:[], sel:new Set(), bindMode:'sammen',
   excluded:new Set(),
@@ -602,13 +609,14 @@ function warnStorage(){
 }
 function todayISO(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 
-function saveCats(){try{localStorage.setItem('gf_cats',JSON.stringify(S.cats.map(c=>({id:c.id,name:c.name,names:c.names}))));}catch(e){warnStorage();}}
+function saveCats(){try{localStorage.setItem('gf_cats',JSON.stringify(S.cats.map(c=>({id:c.id,name:c.name,names:c.names,color:c.color}))));}catch(e){warnStorage();}}
 function loadCats(){
   try{
     const d=localStorage.getItem('gf_cats');if(!d)return;
     const s=JSON.parse(d);if(!Array.isArray(s)||!s.length)return;
     const rene=s.filter(x=>x&&typeof x.id==='string'&&Array.isArray(x.names)).slice(0,MAX_CATS)
-      .map(x=>({id:x.id,name:typeof x.name==='string'?x.name:'Kategori',names:x.names.filter(n=>typeof n==='string')}));
+      .map((x,i)=>({id:x.id,name:typeof x.name==='string'?x.name:'Kategori',names:x.names.filter(n=>typeof n==='string'),
+        color:Number.isInteger(x.color)?x.color:i}));  // eldre data mangler color
     if(rene.length)S.cats=rene;
   }catch(e){}
 }
@@ -671,7 +679,7 @@ function exportData(){
   const payload={
     version:5,
     exported:new Date().toISOString(),
-    cats:S.cats.map(c=>({id:c.id,name:c.name,names:c.names})),
+    cats:S.cats.map(c=>({id:c.id,name:c.name,names:c.names,color:c.color})),
     bindings:S.bindings,
     apart:S.apart,
     coOcc:S.coOcc,
@@ -710,7 +718,7 @@ function importData(input){
       }
     }
     if(!confirm('Erstatte all eksisterende data med importert data?'))return;
-    S.cats=d.cats.map(x=>({id:x.id,name:typeof x.name==='string'?x.name:'Kategori',names:x.names.slice()}));
+    S.cats=d.cats.map((x,i)=>({id:x.id,name:typeof x.name==='string'?x.name:'Kategori',names:x.names.slice(),color:Number.isInteger(x.color)?x.color:i}));
     applyCatColors();
     S.coOcc=(d.coOcc&&typeof d.coOcc==='object')?d.coOcc:{};
     S.opp=(d.opp&&typeof d.opp==='object')?d.opp:{};
@@ -736,7 +744,14 @@ function gco(a,b){return S.coOcc[ck(a,b)]||0;}
 // Hvor mange økter har begge to vært med i? Uten tallet ville en spiller som
 // møter annenhver gang se ut som om hen «skylder» samspill med alle.
 // Eldre data uten oppmøtetall faller tilbake på «alle var med hver gang».
-function gopp(a,b){const v=S.opp[ck(a,b)];return v===undefined?S.genCount:v;}
+function gopp(a,b){
+  const v=S.opp[ck(a,b)];
+  if(v!==undefined)return v;
+  // Finnes det oppmøtetall i det hele tatt, betyr en manglende nøkkel at de to
+  // aldri har vært med samtidig. Bare helt gamle data uten oppmøtetelling skal
+  // falle tilbake på «alle var med hver gang».
+  return Object.keys(S.opp).length?0:S.genCount;
+}
 // Har vi noe å bygge på i det hele tatt?
 function harHistorikk(){return S.archive.length>0||Object.keys(S.coOcc).length>0;}
 function recordGen(groups,matchDate){
@@ -779,7 +794,7 @@ function nextCatId(){
 function addCat(){
   if(S.cats.length>=MAX_CATS){showToast(`Det er plass til ${MAX_CATS} kategorier`);return;}
   const id=nextCatId();if(!id)return;
-  S.cats.push({id,name:`Kategori ${id.toUpperCase()}`,names:[]});
+  S.cats.push({id,name:`Kategori ${id.toUpperCase()}`,names:[],color:nextCatColor()});
   saveCats();applyCatColors();renderPoolGrid();
 }
 function removeCat(id){
@@ -863,7 +878,7 @@ function tegnKravliste(listeId,tomId,krav,slettFn,type){
   list.innerHTML=krav.map((b,i)=>`
     <div class="constraint-item${type==='ikke'?' apart':''}">
       <div class="constraint-badges">${b.map(n=>{const cat=catFor(n);return`<span class="c-badge" data-c="${cat?.id||'a'}">${h(n)}</span>`;}).join('<span class="c-sep">og</span>')}</div>
-      <button class="c-del" onclick="${slettFn}(${i})">×</button>
+      <button class="c-del" aria-label="Fjern dette kravet" onclick="${slettFn}(${i})">×</button>
     </div>`).join('');
 }
 function removeBinding(i){S.bindings.splice(i,1);saveBindings();renderConstraints();}
@@ -893,7 +908,7 @@ function renderPoolGrid(){
       <div class="pool-cat-body">
         <div class="pool-input-row">
           <input type="text" class="pool-name-input" id="pni_${cat.id}" placeholder="Nytt navn…" onkeydown="if(event.key==='Enter')addPoolName('${cat.id}')">
-          <button class="pool-add-btn" onclick="addPoolName('${cat.id}')">+</button>
+          <button class="pool-add-btn" aria-label="Legg til spilleren" onclick="addPoolName('${cat.id}')">+</button>
         </div>
         <div class="pool-names-list" id="pnl_${cat.id}">${renderPoolNameList(cat)}</div>
         <div class="pool-cat-count" id="pnc_${cat.id}" ${!cat.names.length?'style="display:none"':''}>${cat.names.length} spillere</div>
@@ -910,7 +925,7 @@ function renderPoolNameList(cat){
       <button class="pool-row-btn" title="Bytt kategori" onclick="openCatMenu(event,'${cat.id}',${i})">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2.5 5.5h9m0 0L9 3m2.5 2.5L9 8M13.5 10.5h-9m0 0L7 8m-2.5 2.5L7 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <button class="pool-name-del" onclick="removePoolName('${cat.id}',${i})">×</button>
+      <button class="pool-name-del" aria-label="Slett spilleren" onclick="removePoolName('${cat.id}',${i})">×</button>
     </div>
   </div>`).join('');
 }
@@ -1136,6 +1151,24 @@ function tryGenerate(people,numGroups,maxSize,forcedTogether,am){
     for(const p of members){groups[chosen.i].push(p);done.add(p.name);}
   }
 
+  // Så «ikke sammen»-gruppene. De må plasseres før de frie spillerne: fyller vi
+  // lagene først, kan siste medlem ende opp uten et eneste lovlig lag igjen.
+  for(const grp of apartGroups(activeSet).sort((a,b)=>b.length-a.length)){
+    for(const navn of shuffle([...grp])){
+      if(done.has(navn))continue;
+      const p=people.find(x=>x.name===navn);
+      if(!p)continue;
+      const cands=groups.map((g,i)=>({i,space:maxSize-g.length}))
+        .filter(c=>c.space>0&&canPlace(groups[c.i],p,am));
+      if(!cands.length)return null;
+      cands.sort((a,b)=>b.space-a.space);
+      const top=cands[0].space;
+      const pool=cands.filter(c=>c.space>=top-1);
+      const valgt=pool[Math.floor(Math.random()*pool.length)];
+      groups[valgt.i].push(p);done.add(p.name);
+    }
+  }
+
   if(!distributeBalanced(groups,shuffle(people.filter(p=>!done.has(p.name))),maxSize,am))return null;
   return groups;
 }
@@ -1165,14 +1198,11 @@ function distributeBalanced(groups,rem,maxSize,am){
   return true;
 }
 
-// Variansen i alle parvise samspillstall HVIS denne inndelingen brukes.
-// Vi holder summen og kvadratsummen, slik at et bytte kan verdsettes
-// uten å regne ut hele scoren på nytt (se swapDelta).
-// Samspillstallene slås opp titusenvis av ganger per generering. Vi legger dem
-// derfor i en tabell med tallindeks, i stedet for å bygge en strengnøkkel hver gang.
-// Gamle økter skal ikke telle like tungt som ferske. Vekten halveres for hver
-// HALVERING økter bakover i tid, så en kamp for et år siden påvirker lite, mens
-// forrige uke påvirker mye. Statistikkfanen viser fortsatt de rå tallene.
+// Samspillstallene slås opp titusenvis av ganger per generering, så de legges
+// i en tabell med tallindeks i stedet for å bygge en strengnøkkel hver gang.
+// Samtidig vektes de: gamle økter skal ikke telle like tungt som ferske, og
+// vekten halveres for hver HALVERING økter bakover i tid. Statistikkfanen
+// viser fortsatt de rå tallene.
 const HALVERING=20;
 let CO=null;
 function buildCoMatrix(people){
@@ -1302,9 +1332,14 @@ function localSearch(groups,locked,am,iters){
 // brukerens egne «ikke sammen»-krav.
 function getForcedConstraints(people){
   if(!harHistorikk())return{together:[]};
+  // Par som skal holdes fra hverandre har per definisjon lavest samspill, så
+  // uten dette filteret ville dyttet velge nettopp dem, og gjøre lagene umulige.
+  const am=apartMap(new Set(people.map(p=>p.name)));
   const pairs=[];
   for(let i=0;i<people.length;i++)for(let j=i+1;j<people.length;j++){
-    pairs.push({pa:people[i],pb:people[j],v:pairVal(people[i],people[j],false)});
+    const a=people[i],b=people[j];
+    if(am.get(a.name)&&am.get(a.name).has(b.name))continue;
+    pairs.push({pa:a,pb:b,v:pairVal(a,b,false)});
   }
   if(!pairs.length)return{together:[]};
   const minV=Math.min(...pairs.map(p=>p.v));
@@ -1393,7 +1428,9 @@ function updateSaveBtn(){
 
 // ── Render groups in modal ──
 function renderGroupsModal(){
-  document.getElementById('modalTitle').textContent=`${S.currentGroups.length} lag generert`;
+  // Tomme lag arkiveres ikke, så de skal heller ikke telles med her
+  const medSpillere=S.currentGroups.filter(g=>g.length).length;
+  document.getElementById('modalTitle').textContent=`${medSpillere} lag generert`;
   document.getElementById('modalDateLabel').textContent=fmtDate(S.currentMatchDate);
   updateSaveBtn();
   document.getElementById('groupsGrid').innerHTML=S.currentGroups.map((g,gi)=>{
